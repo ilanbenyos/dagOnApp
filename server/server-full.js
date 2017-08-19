@@ -44,7 +44,11 @@ const io = require('socket.io')(http);
 function dbConnect() {
 
 	return new Promise((resolve, reject) => {
-		// Connection URL
+		// Connection URL  
+		var dbUser = 'ilanben';
+		var dbPassword = 'xsw23edc';
+		
+		// var url = 	`mongo ds145303.mlab.com:45303/proto-proj -u ${dbUser} -p ${dbPassword}`	;
 		var url = 'mongodb://localhost:27017/seed';
 		// Use connect method to connect to the Server
 		mongodb.MongoClient.connect(url, function (err, db) {
@@ -53,7 +57,7 @@ function dbConnect() {
 				reject(err);
 			}
 			else {
-				//cl("Connected to DB");
+				cl("Connected to DB");
 				resolve(db);
 			}
 		});
@@ -81,32 +85,9 @@ app.get('/data/:objType', function (req, res) {
 
 // GETs a single
 app.get('/data/:objType/:id', function (req, res) {
-	const objType = req.params.objType;
-	const objId = req.params.id;
-	cl(`Getting you an ${objType} with id: ${objId}`);
-	dbConnect()
-		.then((db) => {
-			const collection = db.collection(objType);
-			let _id;
-			try {
-				_id = new mongodb.ObjectID(objId);
-			}
-			catch (e) {
-				return Promise.reject(e);
-			}
-			return collection.findOne({ _id: _id })
-				.then((obj) => {
-					cl("Returning a single" + objType);
-					res.json(obj);
-					db.close();	
-				})
-				.catch(err => {
-					cl('Cannot get you that ', err)
-					res.json(404, { error: 'not found' })
-					db.close();	
-				})
+		mainHub(req.body,res);
 
-		});
+	
 });
 
 // DELETE
@@ -141,12 +122,14 @@ app.post('/data/:objType', upload.single('file'), function (req, res) {
 	cl("POST for " + objType);
 
 	const obj = req.body;
-	delete obj._id;
+	// mainHub(obj);
+	// delete obj._id;
 	// If there is a file upload, add the url to the obj
-	if (req.file) {
-		obj.imgUrl = serverRoot + req.file.filename;
-	}
-
+	// if (req.file) {
+	// 	obj.imgUrl = serverRoot + req.file.filename;
+	// }
+	
+	// res.json(obj);
 	dbConnect().then((db) => {
 		const collection = db.collection(objType);
 
@@ -221,7 +204,16 @@ function requireLogin(req, res, next) {
 app.get('/protected', requireLogin, function (req, res) {
 	res.end('User is loggedin, return some data');
 });
-
+//=================================================================
+function mainHub(body,res){
+		
+		switch (body.type) {
+			case 'SENDMSG'://    
+				body.msg.txt = 'changed2-' + Date.now()
+				res.json(body);
+			break;
+		}
+}
 
 // Kickup our server 
 // Note: app.listen will not work with cors and the socket
@@ -253,26 +245,7 @@ cl('WebSocket is Ready');
 io.on('connection', function (socket) {
 	//====================
 	socket.on('disconnect', function (ev) {
-		// console.log('user disconnected, socket.id=', socket.id);
-		//	console.log('users ', users);
-		if (users.length > 0) {
-			var id = socket.id;
-			var idx = users.findIndex(function (user, idx) {
-				// console.log('***user ', user.id , ' socket id = ', id);
-				return user.socketId == id
-				// return idx ;
-			});
-
-			console.log('idx:', idx)
-			// console.log('user:', users[idx])
-			var txt = " user as left the building"
-			var obj = { txt: txt, processed: true, from: "server", type1: "user disconnected" }
-			if (idx >= 0) {
-				// console.log('splicing user:', users[idx].nickName)
-				users.splice(idx, 1);
-				sendAll('msg received', obj);
-			}
-		}
+		console.log('user disconnected, socket.id=', socket.id);
 	});
 	//=====================================================
 	//=====================================================

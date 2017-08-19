@@ -1,32 +1,24 @@
 <template>
   <div id="app" class="container">
+    =={{msg}}==
     <MainNav class="navbar" />
-    <button class="button" @click="goToCard">goToCard</button>
     <router-view></router-view>
   
   </div>
 </template>
 <script>
 import MainNav from '@/components/MainNav';
-import { GET_VALS_FROM_STORAGE } from './store/store'
 
 export default {
   name: 'app',
   data() {
     return {
+      msg:'App.vue',
     }
   },
     created() {
-      this.getValsFromStorage() ;
     },
     methods: {
-      goToCard(){
-          this.$router.push('card');
-      },
-        getValsFromStorage(){
-            var msg = {dommy:'dommy'}
-            this.$store.dispatch({ type: GET_VALS_FROM_STORAGE, msg: msg })
-        }
     },
   components: {
     MainNav,
