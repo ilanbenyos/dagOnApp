@@ -67,27 +67,11 @@ function dbConnect() {
 // GETs a list
 app.get('/data/:objType', function (req, res) {
 	const objType = req.params.objType;
-	dbConnect().then(db => {
-		const collection = db.collection(objType);
-
-		collection.find({}).toArray((err, objs) => {
-			if (err) {
-				cl('Cannot get you a list of ', err)
-				res.json(404, { error: 'not found' })
-			} else {
-				cl("Returning list of " + objs.length + " " + objType + "s");
-				res.json(objs);
-			}
-			db.close();
-		});
-	});
 });
 
 // GETs a single
 app.get('/data/:objType/:id', function (req, res) {
-		mainHub(req.body,res);
-
-	
+	mainHub(req, res);
 });
 
 // DELETE
@@ -115,38 +99,129 @@ app.delete('/data/:objType/:id', function (req, res) {
 
 // POST - adds 
 app.post('/data/:objType', upload.single('file'), function (req, res) {
-	//console.log('req.file', req.file);
-	// console.log('req.body', req.body);
-
 	const objType = req.params.objType;
-	cl("POST for " + objType);
+	mainHub(req, res);
+});
 
-	const obj = req.body;
-	// mainHub(obj);
-	// delete obj._id;
-	// If there is a file upload, add the url to the obj
-	// if (req.file) {
-	// 	obj.imgUrl = serverRoot + req.file.filename;
-	// }
-	
-	// res.json(obj);
+
+//============================================================
+function addRecord(obj, type1){
+	// const obj = req.body.msg.data;
+	return new Promise((resolve, reject) => {
 	dbConnect().then((db) => {
-		const collection = db.collection(objType);
-
+		const collection = db.collection(type1);
+		obj._id = Date.now() ;
 		collection.insert(obj, (err, result) => {
 			if (err) {
-				cl(`Couldnt insert a new ${objType}`, err)
-				res.json(500, { error: 'Failed to add' })
+				cl(`addRecord.Couldnt insert a new ${type1}`, err)
+				reject ({status:'err',err:err})
+				// res.json(500, { error: 'Failed to add' })
 			} else {
-				cl(objType + " added");
-				res.json(obj);
+				cl('addRecord.'+ type1 + " added");
+				obj.status='success';
+				resolve ({status:'success',obj})
+				// res.json(obj);
 			}
 			db.close();
 		});
 	});
-
 });
+}
+//============================================================
+function addUser(req, res){
+	const obj = req.body.msg.act.data;
+	var type1 = 'users';
+	addRecord(obj,type1).then(function(arg){
+			if (arg.status==='err') {
+				res.json(500, { error: 'Failed to add' })
+			} else {
+				arg.obj.status='success';
+				res.json(arg.obj);
+			}
+	})
+}
+//============================================================deleteUser
+function getList(req, res){
+	const list = req.body.msg.act.list;
+	getListFromDb(list).then(function(list){
+			if (list.status==='err') {
+				res.json(500, { error: 'Failed to add' })
+			} else {
+				res.json(list.objs);
+			}
+	})
+}
+//============================================================
+function getListFromDb(type1){
+	return new Promise((resolve, reject) => {
+		dbConnect().then(db => {
+			const collection = db.collection(type1);
+			collection.find({}).toArray((err, objs) => {
+				if (err) {
+					cl('Cannot get you a list of ', err)
+					reject ({status:'err not found',err:err})
+				} else {
+					cl("Returning list of " + objs.length + " " + type1 + "s");
+					resolve ({status:'success',objs})
+				}
+				db.close();
+			});
+		});
+	})
+}
+//============================================================
+function deleteUser(req, res){
+	const userId = req.body.msg.act.user;
+	const list = 'users';
+	
+	deleteRecordFromDb(list,userId).then(function(dbRes){
+			if (dbRes.status==='err') {
+				res.json(500, { error: 'Failed to add' })
+			} else {
+				res.json(dbRes.status);
+			}
+	})
+}
 
+//============================================================
+function deleteRecordFromDb(list,objId){
+	cl(`Requested to DELETE the ${list} with id: ${objId}`);
+	return new Promise((resolve, reject) => {
+			dbConnect().then((db) => {
+				var collection = db.collection(list);
+				collection.deleteOne({ "_id": objId }, (err, result) => {
+					if (err) {
+						cl('Cannot Delete', err)
+							reject ({status:'err deleteing failed',err:err})
+					} else {
+						cl("Deleted", result);
+						resolve ({status:'success'})
+					}
+					db.close();
+				});
+			});
+	});
+}
+
+//============================================================
+function mainHub(req, res){
+	const actType = req.body.msg.act.actType;
+		switch (actType) {
+			case 'addUser':  
+				console.log('=====================addUser')
+				addUser(req, res);
+			break;
+			case 'getList':  //
+				console.log('=====================getList')
+				getList(req, res);
+			break;
+			case 'deleteUser':  //deleteUser
+				console.log('=====================deleteUser')
+				deleteUser(req, res);
+			break;
+		}
+}
+//============================================================
 // PUT - updates
 app.put('/data/:objType/:id', function (req, res) {
 	const objType 	= req.params.objType;
@@ -170,50 +245,6 @@ app.put('/data/:objType/:id', function (req, res) {
 	});
 });
 
-// Basic Login/Logout/Protected assets
-app.post('/login', function (req, res) {
-	dbConnect().then((db) => {
-		db.collection('user').findOne({ username: req.body.username, pass: req.body.pass }, function (err, user) {
-			if (user) {
-				cl('Login Succesful');
-				delete user.pass;
-				req.session.user = user;  //refresh the session value
-				res.json({ token: 'Beareloginr: puk115th@b@5t', user });
-			} else {
-				cl('Login NOT Succesful');
-				req.session.user = null;
-				res.json(403, { error: 'Login failed' })
-			}
-		});
-	});
-});
-
-app.get('/logout', function (req, res) {
-	req.session.reset();
-	res.end('Loggedout');
-});
-
-function requireLogin(req, res, next) {
-	if (!req.session.user) {
-		cl('Login Required');
-		res.json(403, { error: 'Please Login' })
-	} else {
-		next();
-	}
-};
-app.get('/protected', requireLogin, function (req, res) {
-	res.end('User is loggedin, return some data');
-});
-//=================================================================
-function mainHub(body,res){
-		
-		switch (body.type) {
-			case 'SENDMSG'://    
-				body.msg.txt = 'changed2-' + Date.now()
-				res.json(body);
-			break;
-		}
-}
 
 // Kickup our server 
 // Note: app.listen will not work with cors and the socket

@@ -14,7 +14,7 @@ import {userStore} from './store'
 
 
 export default new Vuex.Store({
-  state: {loggedinUser: {name: 'Puki'}},
+  state: {},
   modules: {
     // contact: contactStore,
     user: userStore

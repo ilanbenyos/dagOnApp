@@ -55,8 +55,8 @@ const sendMsg = msg => {
       console.log('service.sendMsg1:', msg);
    return axios.post(baseUrl+'/data/sendMsg', msg)
    .then(function (response) {
-      console.log('service.sendMsg2:', response.data.data);
-      return response.data.msg;
+      console.log('service.sendMsg2:', response.data);
+      return response.data;
     })
 }
 //=====================================================================
