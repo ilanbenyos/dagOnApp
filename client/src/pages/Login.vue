@@ -7,20 +7,28 @@
       <button class="button" @click="getMsgFromServer($event)">getMsgFromServer</button>
         <div>
             <button class="button" @click="getUsers">getUsers</button>
-                last user:<div class="users" >{{users[(users.length)-1]}}</div>
+                last user:<div class="users" >users.length:{{users.length}}</div>
+          <div>
+              <div  v-for="(user1,idx) in users" ><div v-if= "idx<7" >{{idx}}:{{user1.userName}}/{{user1.password}}</div></div>
+          </div>
         </div>
 
         curr user:<div class="user" >{{user}}</div>
-        <button class="button" @click="deleteUser">deleteUser</button>
-        userName:<input v-model="tempUser.userName" class="input" placeholder="Choose username" ></input>
-        pass:<input v-model="tempUser.password" class="input" placeholder="Choose password" ></input>
-        txt:<input v-model="tempUser.txt" class="input" placeholder="free txt" ></input>
-        <button class="button" @click="submit">submit</button>
-        <button class="button" @click="updateUser">updateUser</button>
-        
-        dog name:<input v-model="dog.name" class="input" placeholder="dog name" ></input>
-        dog type:<input v-model="dog.type" class="input" placeholder="dog type" ></input>
-        <button class="button" @click="insertDog">insertDog</button>
+        <div>
+            userName:<input v-model="tempUser.userName" class="input" placeholder="Choose username" ></input>
+            pass:<input v-model="tempUser.password" class="input" placeholder="Choose password" ></input>
+            txt:<input v-model="tempUser.txt" class="input" placeholder="free txt" ></input>
+            <div>
+              <button class="button" @click="submit">submit</button>
+              <button class="button" @click="updateUser">updateUser</button>
+              <button class="button" @click="deleteUser">deleteUser</button>
+            </div>
+        </div>
+        <div>
+            dog name:<input v-model="dog.name" class="input" placeholder="dog name" ></input>
+            dog type:<input v-model="dog.type" class="input" placeholder="dog type" ></input>
+            <button class="button" @click="insertDog">insertDog</button>
+        </div>
     </div>
   </transition>
 

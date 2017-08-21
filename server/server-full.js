@@ -44,6 +44,7 @@ app.use(clientSessions({
 	activeDuration: 5 * 60 * 1000,
 }));
 
+
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
@@ -223,9 +224,10 @@ function deleteUser(req, res){
 	const list = 'users';
 	deleteRecordFromDb(list,userId).then(function(dbRes){
 			if (dbRes.status==='err') {
-				reject ({status:'err updating failed',err:err})
+				res.json(500, { error: 'Failed to delete' })
+				// reject ({status:'err updating failed',err:err})
 			} else {
-				resolve ({status:'success'})
+				// resolve ({status:'success'})
 				res.json(dbRes.status);
 			}
 	})
