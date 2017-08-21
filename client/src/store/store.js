@@ -11,8 +11,8 @@ const state = {
   // user: {id:111,password:111,txt:'111'},
   user: {},
   users:[{id:1,userName: '111', txt:'txt111'},{id:2,userName:'222',txt:'txt222'}],
-  storeMsg:'first msg from store'
-
+  storeMsg:'first msg from store',
+  dog:{}
 };
 
 const getters = {
@@ -23,6 +23,10 @@ const getters = {
   fetchGetMsg(state) {
     console.log('store.getters.fetchGetMsg', state.storeMsg)
     return state.storeMsg;
+  },
+  fetchGetDog(state) {
+    console.log('store.getters.fetchGetMsg', state.dog)
+    return state.dog;
   },
   fetchGetList(state) {
     console.log('store.getters.fetchGetList', state.users)
@@ -51,6 +55,11 @@ const mutations = {
 				console.log('store.SENDMSG.agetList');
         var objs = payload.res;
         state.users = objs;
+			break;
+			case 'updateUser'://    
+				console.log('store.SENDMSG.updateUser');
+        var user = payload.msg.act.data;
+        state.user = user;
 			break;
     }
 

@@ -7,6 +7,13 @@
 
 var cl = console.log;
 
+//===========================================
+const Login1 = require('./login');
+var cat = new Login1();
+console.log(cat.makeSound('toyota'));
+var session = cat.getLog('111','111');
+console.log('session=', session.user, session.pass);
+//===========================================
 const express = require('express'),
 	bodyParser = require('body-parser'),
 	cors = require('cors'),
@@ -128,10 +135,10 @@ function addRecord(obj, type1){
 });
 }
 //============================================================
-function addUser(req, res){
+function insertNew(req, res){
 	const obj = req.body.msg.act.data;
-	var type1 = 'users';
-	addRecord(obj,type1).then(function(arg){
+	var collection = req.body.msg.act.collection;
+	addRecord(obj,collection).then(function(arg){
 			if (arg.status==='err') {
 				res.json(500, { error: 'Failed to add' })
 			} else {
@@ -170,19 +177,59 @@ function getListFromDb(type1){
 	})
 }
 //============================================================
-function deleteUser(req, res){
+function updateUser(req, res){
 	const userId = req.body.msg.act.user;
-	const list = 'users';
+	const list 	= 'users';
+	const newObj 	= req.body.msg.act.data;
 	
-	deleteRecordFromDb(list,userId).then(function(dbRes){
+	updateRecordInDb(list,userId,newObj).then(function(dbRes){
 			if (dbRes.status==='err') {
 				res.json(500, { error: 'Failed to add' })
 			} else {
+				res.json(dbRes.user);
+			}
+	})
+}
+//============================================================
+function updateRecordInDb(list,userId,newObj){
+	if (newObj._id && typeof newObj._id === 'string') newObj._id = new mongodb.ObjectID(newObj._id);
+
+	cl(`Requested to UPDATE the ${list} with id: ${newObj._id}`);
+	return new Promise((resolve, reject) => {
+				dbConnect().then((db) => {
+					const collection = db.collection(list);
+					collection.findOneAndReplace(
+									{_id : newObj._id },
+									newObj,
+									{returnOriginal: false},
+						(err, result) => {
+							if (err) {
+								cl('Cannot Update', err)
+								//					reject ({status:'err not found',err:err})
+
+								reject({ error: 'Update failed' })
+							} else {
+								console.log('result:', result.value)
+								resolve ({status:'success',user:result.value})
+							}
+							db.close();
+						});
+				});
+	});
+}
+//============================================================
+function deleteUser(req, res){
+	const userId = req.body.msg.act.user;
+	const list = 'users';
+	deleteRecordFromDb(list,userId).then(function(dbRes){
+			if (dbRes.status==='err') {
+				reject ({status:'err updating failed',err:err})
+			} else {
+				resolve ({status:'success'})
 				res.json(dbRes.status);
 			}
 	})
 }
-
 //============================================================
 function deleteRecordFromDb(list,objId){
 	cl(`Requested to DELETE the ${list} with id: ${objId}`);
@@ -204,20 +251,32 @@ function deleteRecordFromDb(list,objId){
 }
 
 //============================================================
+function insertDog(req, res){
+
+}
+//============================================================
 function mainHub(req, res){
 	const actType = req.body.msg.act.actType;
 		switch (actType) {
 			case 'addUser':  
 				console.log('=====================addUser')
-				addUser(req, res);
+				insertNew(req, res,'users');
 			break;
 			case 'getList':  //
 				console.log('=====================getList')
 				getList(req, res);
 			break;
-			case 'deleteUser':  //deleteUser
+			case 'deleteUser':  //
 				console.log('=====================deleteUser')
 				deleteUser(req, res);
+			break;
+			case 'updateUser':  //
+				console.log('=====================deleteUser')
+				updateUser(req, res);
+			break;
+			case 'insertDog':  //
+				console.log('=====================deleteUser')
+				insertNew(req, res,'dogs');
 			break;
 		}
 }

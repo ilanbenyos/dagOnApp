@@ -15,7 +15,12 @@
         userName:<input v-model="tempUser.userName" class="input" placeholder="Choose username" ></input>
         pass:<input v-model="tempUser.password" class="input" placeholder="Choose password" ></input>
         txt:<input v-model="tempUser.txt" class="input" placeholder="free txt" ></input>
-      <button class="button" @click="submit">submit</button>
+        <button class="button" @click="submit">submit</button>
+        <button class="button" @click="updateUser">updateUser</button>
+        
+        dog name:<input v-model="dog.name" class="input" placeholder="dog name" ></input>
+        dog type:<input v-model="dog.type" class="input" placeholder="dog type" ></input>
+        <button class="button" @click="insertDog">insertDog</button>
     </div>
   </transition>
 
@@ -31,6 +36,7 @@ export default {
       msg:'login',
       users:[],
       user: {},
+      dog:{_id:null,name:'',type:''},
       tempUser:{
                 login: '',
                 password: '',
@@ -38,8 +44,9 @@ export default {
                 }
       }
   },
-    created() {
+    created() {//fetchGetDog
     this.users = this.$store.getters.fetchGetUsers;
+    this.dog = this.$store.getters.fetchGetDog;
 
     var currUserInit1 = this.$store.getters.fetchGetUser;
     var currUserInit = this.cloneDeep(currUserInit1)
@@ -59,7 +66,10 @@ export default {
       },
       users1: function(newUsers){
         this.users = this.$store.getters.fetchGetUsers;
-      }
+      },
+      dog1: function(newDog){
+        this.dog = this.$store.getters.fetchGetDog;
+      },
 
   },
     computed: {
@@ -97,9 +107,21 @@ export default {
           const act = { actType: 'getList', list:'users'};
           const params = { event:e,askFrom:'server'}
           this.sendMsg({ act,params})
+      },//
+      insertDog(e){
+        const act = { actType: 'insertDog', data: this.dog , collection: 'dogs'}
+        const params = { event:e,askFrom:'server'}
+          this.sendMsg({ act,params})
       },
       submit(e){
-        const act = { actType: 'addUser', data: this.tempUser }
+        const act = { actType: 'addUser', data: this.tempUser, collection: 'users' }
+        const params = { event:e,askFrom:'server'}
+          this.sendMsg({ act,params})
+         this.tempUser = {login: '',password: '',txt:''}
+      },
+      updateUser(e){
+        this.tempUser._id = this.user._id;
+        const act = { actType: 'updateUser', data: this.tempUser }
         const params = { event:e,askFrom:'server'}
           this.sendMsg({ act,params})
          this.tempUser = {login: '',password: '',txt:''}
