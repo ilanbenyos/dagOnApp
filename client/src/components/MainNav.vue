@@ -2,6 +2,7 @@
   <div>
     =={{msg}}==
     <button class="button" @click="goToCard">goToCard</button>
+    <router-link to="/oxygen"><button>Go to oxygen exam</button></router-link>
   </div>
 </template>
 

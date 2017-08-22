@@ -5,6 +5,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Splash from '@/pages/Splash'
 import Login from '@/pages/Login'
+import Oxygen from '@/components/exams/Oxygen'
 
 import Browse from '@/pages/Browse'
 
@@ -26,6 +27,10 @@ export default new Router({
       path: '/browse',
       name: 'Browse',
       component: Browse
-    }
+    },{
+      path: '/oxygen',
+      name: 'Oxygen',
+      component: Oxygen
+    },
   ]
 })
