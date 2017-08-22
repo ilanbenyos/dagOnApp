@@ -50,7 +50,6 @@ const io = require('socket.io')(http);
 
 
 function dbConnect() {
-
 	return new Promise((resolve, reject) => {
 		// Connection URL  
 		var dbUser = 'ilanben';
@@ -72,38 +71,6 @@ function dbConnect() {
 	});
 }
 
-// GETs a list
-app.get('/data/:objType', function (req, res) {
-	const objType = req.params.objType;
-});
-
-// GETs a single
-app.get('/data/:objType/:id', function (req, res) {
-	mainHub(req, res);
-});
-
-// DELETE
-app.delete('/data/:objType/:id', function (req, res) {
-	const objType 	= req.params.objType;
-	const objId 	= req.params.id;
-	cl(`Requested to DELETE the ${objType} with id: ${objId}`);
-	dbConnect().then((db) => {
-		const collection = db.collection(objType);
-		collection.deleteOne({ _id: new mongodb.ObjectID(objId) }, (err, result) => {
-			if (err) {
-				cl('Cannot Delete', err)
-				res.json(500, { error: 'Delete failed' })
-			} else {
-				cl("Deleted", result);
-				res.json({});
-			}
-			db.close();
-		});
-
-	});
-
-
-});
 
 // POST - adds 
 app.post('/data/:objType', upload.single('file'), function (req, res) {
@@ -136,6 +103,91 @@ function addRecord(obj, type1){
 });
 }
 //============================================================
+
+var facilities = [
+		{id:'1',ponds:[1,2,3,4], nameEn:'new Hamama', nameHeb:'חממה חדשה',nameEnShort:'NH',nameHebShort:'ח"י',count:32},
+		{id:'2', nameEn:'old Hamama', nameHeb:'חממה חדשה',nameEnShort:'OH',nameHebShort:'חח',count:31},
+		{id:'3', nameEn:'hatalot', nameHeb:'חממה חדשה',nameEnShort:'ATAL',nameHebShort:'ח"י',count:32},
+		{id:'4', nameEn:'bet ariza', nameHeb:'חממה חדשה',nameEnShort:'BetH',nameHebShort:'ח"י',},
+		{id:'5', nameEn:'KC', nameHeb:'KC',nameEnShort:'KC',nameHebShort:'KC'},
+				]
+var ponds = [
+		{id:'1', fac:'1',vol:4,name:'ח1'},
+		{id:'2', fac:'1',vol:4,name:'2ח'},
+		{id:'3', fac:'1',vol:4,name:'3ח'},
+		{id:'4', fac:'1',vol:4,name:'ח4'},
+		{id:'5', fac:'1',vol:4,name:'5ח'},
+		{id:'6', fac:'1',vol:4,name:'6ח'},
+		{id:'7', fac:'1',vol:4,name:'7ח'},
+		{id:'8', fac:'1',vol:4,name:'8ח'},
+		{id:'9', fac:'1',vol:4,name:'ח9'},
+		{id:'10', fac:'1',vol:4,name:'ח10'},
+		{id:'11', fac:'1',vol:4,name:'ח11'},
+		{id:'12', fac:'1',vol:4,name:'ח12'},
+		{id:'13', fac:'1',vol:4,name:'ח13'},
+		{id:'14', fac:'1',vol:4,name:'ח14'},
+		{id:'15', fac:'1',vol:4,name:'ח15'},
+		{id:'16', fac:'1',vol:4,name:'ח16'},
+		{id:'17', fac:'1',vol:4,name:'ח17'},
+		{id:'18', fac:'1',vol:4,name:'ח18'},
+		{id:'19', fac:'1',vol:4,name:'ח19'},
+		{id:'20', fac:'1',vol:4,name:'20ח'},
+		{id:'21', fac:'1',vol:22,name:'21ח'},
+		{id:'22', fac:'1',vol:22,name:'22ח'},
+		{id:'23', fac:'1',vol:22,name:'23ח'},
+		{id:'24', fac:'1',vol:22,name:'24ח'},
+		{id:'25', fac:'1',vol:22,name:'25ח'},
+		{id:'26', fac:'1',vol:22,name:'26ח'},
+		{id:'27', fac:'1',vol:22,name:'27ח'},
+		{id:'28', fac:'1',vol:22,name:'28ח'},
+		{id:'29', fac:'1',vol:22,name:'29ח'},
+		{id:'30', fac:'1',vol:22,name:'ח30'},
+		
+		{id:'31', fac:'2',vol:4,name:'1ט'},
+		{id:'32', fac:'2',vol:4,name:'2ט'},
+		{id:'33', fac:'2',vol:4,name:'3ט'},
+		{id:'34', fac:'2',vol:4,name:'4ט'},
+		{id:'35', fac:'2',vol:4,name:'5ט'},
+		{id:'36', fac:'2',vol:4,name:'6ט'},
+		{id:'37', fac:'2',vol:22,name:'6ט'},
+		{id:'38', fac:'2',vol:22,name:'7ט'},
+		{id:'39', fac:'2',vol:22,name:'8ט'},
+		{id:'40', fac:'2',vol:22,name:'9ט'},
+
+		{id:'41', fac:'3',vol:4,name:'R1'},
+		{id:'42', fac:'3',vol:4,name:'R2'},
+		{id:'43', fac:'3',vol:4,name:'R3'},
+		{id:'44', fac:'3',vol:4,name:'4R'},
+		{id:'45', fac:'3',vol:4,name:'R5'},
+		{id:'46', fac:'3',vol:4,name:'R6'},
+		{id:'47', fac:'3',vol:22,name:'R7'},
+		{id:'48', fac:'3',vol:22,name:'R8'},
+		{id:'49', fac:'3',vol:22,name:'R9'},
+		{id:'50', fac:'3',vol:22,name:'R10'},
+
+]
+var users1=[
+	{name:'motti', userName: 'motke',password:'111'},
+	{name:'guy', userName: 'guy',password:'111'},
+	{name:'chang', userName: 'chang',password:'111'},
+	{name:'yafim', userName: 'yafim',password:'111'},
+]
+function createCollection(collection,name){
+	for (var doc = 0; doc < collection.length; doc++) {
+		var obj = collection[doc];
+		addRecord(obj, name)
+	}
+}
+// createCollection(users1,'users')
+//============================================================
+var count = 1;
+function getCountId(){
+	var id = '_'+ count
+	count ++
+	return id
+}
+
+//============================================================
 function insertNew(req, res){
 	const obj = req.body.msg.act.data;
 	var collection = req.body.msg.act.collection;
@@ -151,7 +203,9 @@ function insertNew(req, res){
 //============================================================deleteUser
 function getList(req, res){
 	const list = req.body.msg.act.list;
-	getListFromDb(list).then(function(list){
+	const criteria = req.body.msg.act.criteria;
+	
+	getListFromDb(list,criteria).then(function(list){
 			if (list.status==='err') {
 				res.json(500, { error: 'Failed to add' })
 			} else {
@@ -160,11 +214,12 @@ function getList(req, res){
 	})
 }
 //============================================================
-function getListFromDb(type1){
+function getListFromDb(type1,criteria){
+	// console.log('getListFromDb1:',type1,criteria)
 	return new Promise((resolve, reject) => {
 		dbConnect().then(db => {
 			const collection = db.collection(type1);
-			collection.find({}).toArray((err, objs) => {
+			collection.find(criteria).toArray((err, objs) => {
 				if (err) {
 					cl('Cannot get you a list of ', err)
 					reject ({status:'err not found',err:err})
@@ -253,10 +308,6 @@ function deleteRecordFromDb(list,objId){
 }
 
 //============================================================
-function insertDog(req, res){
-
-}
-//============================================================
 function mainHub(req, res){
 	const actType = req.body.msg.act.actType;
 		switch (actType) {
@@ -283,28 +334,28 @@ function mainHub(req, res){
 		}
 }
 //============================================================
-// PUT - updates
-app.put('/data/:objType/:id', function (req, res) {
-	const objType 	= req.params.objType;
-	const objId 	= req.params.id;
-	const newObj 	= req.body;
-	if (newObj._id && typeof newObj._id === 'string') newObj._id = new mongodb.ObjectID(newObj._id);
+// // PUT - updates
+// app.put('/data/:objType/:id', function (req, res) {
+// 	const objType 	= req.params.objType;
+// 	const objId 	= req.params.id;
+// 	const newObj 	= req.body;
+// 	if (newObj._id && typeof newObj._id === 'string') newObj._id = new mongodb.ObjectID(newObj._id);
 
-	cl(`Requested to UPDATE the ${objType} with id: ${objId}`);
-	dbConnect().then((db) => {
-		const collection = db.collection(objType);
-		collection.updateOne({ _id: new mongodb.ObjectID(objId) }, newObj,
-			(err, result) => {
-				if (err) {
-					cl('Cannot Update', err)
-					res.json(500, { error: 'Update failed' })
-				} else {
-					res.json(newObj);
-				}
-				db.close();
-			});
-	});
-});
+// 	cl(`Requested to UPDATE the ${objType} with id: ${objId}`);
+// 	dbConnect().then((db) => {
+// 		const collection = db.collection(objType);
+// 		collection.updateOne({ _id: new mongodb.ObjectID(objId) }, newObj,
+// 			(err, result) => {
+// 				if (err) {
+// 					cl('Cannot Update', err)
+// 					res.json(500, { error: 'Update failed' })
+// 				} else {
+// 					res.json(newObj);
+// 				}
+// 				db.close();
+// 			});
+// 	});
+// });
 
 
 // Kickup our server 
@@ -321,16 +372,6 @@ http.listen(3003, function () {
 });
 
 
-// io.on('connection', function (socket) {
-// 	console.log('a user connected');
-// 	socket.on('disconnect', function () {
-// 		console.log('user disconnected');
-// 	});
-// 	socket.on('chat message', function (msg) {
-// 		// console.log('message: ' + msg);
-// 		io.emit('chat message', msg);
-// 	});
-// });
 
 cl('WebSocket is Ready');
 
@@ -339,9 +380,7 @@ io.on('connection', function (socket) {
 	socket.on('disconnect', function (ev) {
 		console.log('user disconnected, socket.id=', socket.id);
 	});
-	//=====================================================
-	//=====================================================
-	//=====================================================
+
 	//=====================================================
 	socket.on('sendMsg', function (msg) {
 		// console.log('chat.js/sendMsg: ' + msg);

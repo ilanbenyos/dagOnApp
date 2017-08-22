@@ -1,5 +1,5 @@
 
-export const SND_MSG = 'SND_MSG';//
+export const SND_MSG = 'SND_MSG';
 export const LOG_IN = 'LOG_IN';
 export const SENDMSG = 'SENDMSG';
 
@@ -10,9 +10,13 @@ const state = {
   loginStatus: true,
   // user: {id:111,password:111,txt:'111'},
   user: {},
-  users:[{id:1,userName: '111', txt:'txt111'},{id:2,userName:'222',txt:'txt222'}],
+  users:[],
   storeMsg:'first msg from store',
-  dog:{}
+  dog:{},
+  acts:[],
+  ponds:[],
+  facilities:[],
+  batches:[]
 };
 
 const getters = {
@@ -21,16 +25,10 @@ const getters = {
     return state.usersMatched;
   },
   fetchGetMsg(state) {
-    console.log('store.getters.fetchGetMsg', state.storeMsg)
     return state.storeMsg;
   },
-  fetchGetDog(state) {
-    console.log('store.getters.fetchGetMsg', state.dog)
-    return state.dog;
-  },
-  fetchGetList(state) {
-    console.log('store.getters.fetchGetList', state.users)
-    return state.users;
+  fetchGetFacilities(state) {
+    return state.facilities;
   },
   fetchGetUser(state) {
     return state.user;
@@ -38,6 +36,22 @@ const getters = {
   fetchGetUsers(state) {
     return state.users;
   },
+  fetchGetPonds(state) {
+    return state.ponds;
+  },
+  //==================
+  fetchGetActs(state) {
+    return state.acts;
+  },
+  fetchGetPonds(state) {
+    return state.ponds;
+  },
+  fetchGetFacilities(state) {
+    return state.facilities;
+  },
+  fetchGetBatchs(state) {
+    return state.batchs;
+  }
 
 }
 
@@ -54,7 +68,8 @@ const mutations = {
 			case 'getList'://    
 				console.log('store.SENDMSG.agetList');
         var objs = payload.res;
-        state.users = objs;
+        var list = payload.msg.act.list
+        state[list] = objs;
 			break;
 			case 'updateUser'://    
 				console.log('store.SENDMSG.updateUser');
