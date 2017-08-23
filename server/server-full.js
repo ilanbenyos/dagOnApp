@@ -295,11 +295,20 @@ function deleteFromList(req, res){
 				res.json(500, { error: 'Failed to delete' })
 				// reject ({status:'err updating failed',err:err})
 			} else {
-				// resolve ({status:'success'})
-				res.json(dbRes.status);
+				if(getListBack){
+					res.msg= 'ok';
+					// getList(req, res);
+					res.json(dbRes.status);
+				}else
+					res.json(dbRes.status);
 			}
 	})
 }
+//============================================================
+function responseToClient(res,msgToClient){
+	res.json(msgToClient);
+}
+
 //============================================================
 function deleteRecordFromDb(list,objId){
 	cl(`Requested to DELETE the ${list} with id: ${objId}`);

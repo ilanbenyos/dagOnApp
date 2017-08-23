@@ -63,6 +63,9 @@ const mutations = {
 
   [SENDMSG](state, payload) {
     var actType = payload.msg.act.actType;
+    if(payload.msg.params.getListBack){
+      
+    }
     switch (actType) {
 			case 'setUser'://    
 				console.log('store.SENDMSG.setUser');
