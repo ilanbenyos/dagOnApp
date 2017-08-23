@@ -52,12 +52,15 @@ const io = require('socket.io')(http);
 function dbConnect() {
 	return new Promise((resolve, reject) => {
 		// Connection URL  
-		var dbUser = 'ilanben';
-		var dbPassword = 'xsw23edc';
-		
-		// var url = 	`mongo ds145303.mlab.com:45303/proto-proj -u ${dbUser} -p ${dbPassword}`	;
-		var url = 'mongodb://localhost:27017/seed';
+		var dbUser = 'ilan';
+		var dbPassword = '123';
+		var url = `mongodb://${dbUser}:${dbPassword}@ds145223.mlab.com:45223/dagon-db`;
+		// var url = 	    "mongodb://ilanben:xsw23edc@ds029665.mlab.com:29665/sprint4"	;
+		// var url = 	"mongodb://kerendot:weddix123@ds159591.mlab.com:59591/weddix";
+		// var url = 	"mongodb://ilanben:xsw23edc@ds145223.mlab.com:45223/dagon-db"	;
+		// var url = 'mongodb://localhost:27017/seed';
 		// Use connect method to connect to the Server
+		console.log('url:', url)
 		mongodb.MongoClient.connect(url, function (err, db) {
 			if (err) {
 				cl('Cannot connect to DB', err)
@@ -92,8 +95,9 @@ function addRecord(obj, type1){
 				reject ({status:'err',err:err})
 				// res.json(500, { error: 'Failed to add' })
 			} else {
-				cl('addRecord.'+ type1 + " added");
+				cl('addRecord.'+ type1 + " added:"+ obj);
 				obj.status='success';
+				
 				resolve ({status:'success',obj})
 				// res.json(obj);
 			}
@@ -172,6 +176,11 @@ var users1=[
 	{name:'chang', userName: 'chang',password:'111'},
 	{name:'yafim', userName: 'yafim',password:'111'},
 ]
+
+var batchs=[
+	{pond:'1', type: '1',amount:20000, size:.2,feedPercent:5,txt:'to australis',parents:[],graderFrom:1, graderTo:3},
+]
+
 function createCollection(collection,name){
 	for (var doc = 0; doc < collection.length; doc++) {
 		var obj = collection[doc];
@@ -179,6 +188,8 @@ function createCollection(collection,name){
 	}
 }
 // createCollection(users1,'users')
+// createCollection(facilities,'facilities')
+// createCollection(ponds,'ponds')
 //============================================================
 var count = 1;
 function getCountId(){
@@ -188,7 +199,7 @@ function getCountId(){
 }
 
 //============================================================
-function insertNew(req, res){
+function addToList(req, res){
 	const obj = req.body.msg.act.data;
 	var collection = req.body.msg.act.collection;
 	addRecord(obj,collection).then(function(arg){
@@ -200,7 +211,7 @@ function insertNew(req, res){
 			}
 	})
 }
-//============================================================deleteUser
+//============================================================
 function getList(req, res){
 	const list = req.body.msg.act.list;
 	const criteria = req.body.msg.act.criteria;
@@ -233,9 +244,10 @@ function getListFromDb(type1,criteria){
 	})
 }
 //============================================================
-function updateUser(req, res){
+function updateInList(req, res){
 	const userId = req.body.msg.act.user;
-	const list 	= 'users';
+	// const list 	= 'users';
+	const list = req.body.msg.act.list;
 	const newObj 	= req.body.msg.act.data;
 	
 	updateRecordInDb(list,userId,newObj).then(function(dbRes){
@@ -274,10 +286,11 @@ function updateRecordInDb(list,userId,newObj){
 	});
 }
 //============================================================
-function deleteUser(req, res){
-	const userId = req.body.msg.act.user;
-	const list = 'users';
-	deleteRecordFromDb(list,userId).then(function(dbRes){
+function deleteFromList(req, res){
+	const objId = req.body.msg.act.objId;
+	var getListBack = req.body.msg.params.getListBack;
+	const list = req.body.msg.act.list;
+	deleteRecordFromDb(list,objId).then(function(dbRes){
 			if (dbRes.status==='err') {
 				res.json(500, { error: 'Failed to delete' })
 				// reject ({status:'err updating failed',err:err})
@@ -298,6 +311,7 @@ function deleteRecordFromDb(list,objId){
 						cl('Cannot Delete', err)
 							reject ({status:'err deleteing failed',err:err})
 					} else {
+						
 						cl("Deleted", result);
 						resolve ({status:'success'})
 					}
@@ -311,25 +325,17 @@ function deleteRecordFromDb(list,objId){
 function mainHub(req, res){
 	const actType = req.body.msg.act.actType;
 		switch (actType) {
-			case 'addUser':  
-				console.log('=====================addUser')
-				insertNew(req, res,'users');
+			case 'addToList':
+				addToList(req, res);
 			break;
 			case 'getList':  //
-				console.log('=====================getList')
 				getList(req, res);
 			break;
-			case 'deleteUser':  //
-				console.log('=====================deleteUser')
-				deleteUser(req, res);
+			case 'deleteFromList':  //
+				deleteFromList(req, res);
 			break;
-			case 'updateUser':  //
-				console.log('=====================deleteUser')
-				updateUser(req, res);
-			break;
-			case 'insertDog':  //
-				console.log('=====================deleteUser')
-				insertNew(req, res,'dogs');
+			case 'updateInList':  //
+				updateInList(req, res);
 			break;
 		}
 }

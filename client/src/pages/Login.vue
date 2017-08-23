@@ -14,7 +14,9 @@
             <button class="button" @click="getList($event,'ponds',{fac:{$gt:'1'}})">get ponds from fac 1</button>
                 ponds:<div class="users" >ponds.length:{{ponds.length}}</div>
           <div>
-              <div  v-for="(user1,idx) in users" ><div v-if= "idx<7" >{{idx}}:{{user1.userName}}/{{user1.password}}</div></div>
+              <div  v-for="(user1,idx) in users" v-if= "idx<7"><div  >{{idx}}:{{user1.userName}}/{{user1.password}}</div>
+                  <button class="button" @click="setUser($event,user1)">set user</button>
+              </div>
               <div  v-for="(pond,idx) in ponds" ><div v-if= "idx<7" >id:{{pond.id}}/name{{pond.name}}</div></div>
           </div>
         </div>
@@ -27,7 +29,7 @@
             <div>
               <button class="button" @click="submit">submit</button>
               <button class="button" @click="updateUser">updateUser</button>
-              <button class="button" @click="deleteUser">deleteUser</button>
+              <button class="button" @click="deleteFromList($event,'users',user._id)">deleteUser</button>
             </div>
         </div>
         <div>
@@ -94,8 +96,10 @@ export default {
     facilities1() {return this.$store.getters.fetchGetFacilities;},
 },
   methods: {//
-      getUser(){
-        this.user = this.$store.getters.fetchGetUser;
+      setUser(e,user){
+          const act = { actType: 'setUser', user};
+          const params = { event:e,askFrom:'store'}
+          this.sendMsg({ act,params})
       },
     cloneDeep(obj){
       var myJSON = JSON.stringify(obj);
@@ -109,8 +113,8 @@ export default {
           this.msg = this.$store.getters.fetchGetMsg;
           console.log('getMsgFromStore')
       },
-      deleteUser(e){
-          const act = { actType: 'deleteUser', user:this.user._id};
+      deleteFromList(e,list,id){
+          const act = { actType: 'deleteFromList', user:id,list};
           const params = { event:e,askFrom:'server'}
           this.sendMsg({ act,params})
       },
@@ -131,14 +135,14 @@ export default {
       },//
 
       submit(e){
-        const act = { actType: 'addUser', data: this.tempUser, collection: 'users' }
+        const act = { actType: 'addToList', data: this.tempUser, collection: 'users' }
         const params = { event:e,askFrom:'server'}
           this.sendMsg({ act,params})
          this.tempUser = {login: '',password: '',txt:''}
       },
       updateUser(e){
         this.tempUser._id = this.user._id;
-        const act = { actType: 'updateUser', data: this.tempUser }
+        const act = { actType: 'updateInList', data: this.tempUser }
         const params = { event:e,askFrom:'server'}
           this.sendMsg({ act,params})
          this.tempUser = {login: '',password: '',txt:''}

@@ -16,7 +16,9 @@ const state = {
   acts:[],
   ponds:[],
   facilities:[],
-  batches:[]
+  fishes:[],
+  batches:[],
+  fish:''
 };
 
 const getters = {
@@ -27,19 +29,12 @@ const getters = {
   fetchGetMsg(state) {
     return state.storeMsg;
   },
-  fetchGetFacilities(state) {
-    return state.facilities;
-  },
   fetchGetUser(state) {
     return state.user;
   },
   fetchGetUsers(state) {
     return state.users;
   },
-  fetchGetPonds(state) {
-    return state.ponds;
-  },
-  //==================
   fetchGetActs(state) {
     return state.acts;
   },
@@ -51,6 +46,15 @@ const getters = {
   },
   fetchGetBatchs(state) {
     return state.batchs;
+  },
+  fetchGetFishes(state) {
+    return state.fishes;
+  },
+  fetchGetCurrFish(state) {
+    return state.currFish;
+  },
+  fetchGetState(state) {
+    return state;
   }
 
 }
@@ -60,10 +64,16 @@ const mutations = {
   [SENDMSG](state, payload) {
     var actType = payload.msg.act.actType;
     switch (actType) {
-			case 'addUser'://    
-				console.log('store.SENDMSG.addUser');
-        var obj1 = payload.res;
+			case 'setUser'://    
+				console.log('store.SENDMSG.setUser');
+        var obj1 = payload.msg.act.user;
         state.user = obj1;
+			break;
+			case 'addToList'://    
+				console.log('store.SENDMSG.addToList');
+        var obj1 = payload.res;
+        var list = payload.msg.act.list
+        state[list] = obj1;
 			break;
 			case 'getList'://    
 				console.log('store.SENDMSG.agetList');
@@ -71,7 +81,7 @@ const mutations = {
         var list = payload.msg.act.list
         state[list] = objs;
 			break;
-			case 'updateUser'://    
+			case 'updateInList'://    
 				console.log('store.SENDMSG.updateUser');
         var user = payload.msg.act.data;
         state.user = user;
