@@ -10,7 +10,7 @@
                 <div class="field flex row nameHeb"><div class="field">heb:</div><input class="input" v-model="fish.nameHeb"></input></div>
                 <div class="field flex row nameShort"><div class="field">short:</div><input class="input" v-model="fish.nameShort"></input></div>
                 <div v-if="fish.status !='newRecord'" class="buttons-pnl">
-                    <button  class="button" @click="updateInList(fish._id,'fishes')">update</button>
+                    <button  class="button" @click="editFish(fish._id)">update</button>
                     <button class="button" @click="deleteFromList('fishes',fish._id)">delete</button>
                 </div>
                 <div v-else class="buttons-pnl new-record">
@@ -58,20 +58,19 @@ export default {
   methods: {//
       newRecord(list,obj,e){
             delete obj.status;
-            const acts =[
-                    { actType: 'addToList', data: obj, list,askFrom:'server' },
-                    { actType: 'getList', list, criteria:{},askFrom:'server' }
-                        ]
-            this.sendMsg( {acts});
+            const act = { actType: 'addToList', data: obj, collection: list };
+            const params = { event:e,askFrom:'server',getListBack:true};
+            this.sendMsg({ act,params});
       },
       addNewLocalRecord(arr){
         var obj = {status:'newRecord'}
         this.fishes.push(obj);
       },
       getList(listName,criteria){
-            const acts =[{ actType: 'getList', list:listName, criteria:{} }];
-            this.sendMsg({acts});
-      },
+          const act = { actType: 'getList', list:listName,criteria};
+          const params = { askFrom:'server'}
+          this.sendMsg({ act,params})
+      },//
       setCurrFish(){
             this.currFish = {_id:null,name:'',nameHeb:'',nameShort:''}
       },
@@ -82,33 +81,26 @@ export default {
             return obj
         },
       deleteFromList(list,id,e){
-            const acts =[
-                            { actType: 'deleteFromList', objId:id, list},
-                            { actType: 'getList', list, criteria:{}}
-                        ]
-            this.sendMsg({acts});
+          const act = { actType: 'deleteFromList', objId:id,list};
+          const params = { event:e,askFrom:'server',getListBack:true}
+          this.sendMsg({ act,params})
       },
-    updateInList(objId,list){
-        var newObj = this.getObjById(objId,this[list]);
-        const acts =[
-                        { actType: 'updateInList', list,objId,newObj },
-                        { actType: 'getList', list, criteria:{}}
-                    ]
-        this.sendMsg({acts});
+    editFish(id,e){
+        var fishObj = this.getObjById(id,this.fishes);
+        const act = { actType: 'updateInList', data: fishObj, list: 'fishes' };
+        const params = { event:e,askFrom:'server',getListBack:true};
+          this.sendMsg({ act,params});
         
       },
     submit(e){
-        // var actType = (typeof(this.currFish._id== 'undefined'))?'addToList': 'updateInList' ;
-        // const act = { actType: actType, data: this.currFish, collection: 'fishes' };
-        // const params = { event:e,askFrom:'server',getListBack:true};
-        //   this.sendMsg({ act,params});
+        var actType = (typeof(this.currFish._id== 'undefined'))?'addToList': 'updateInList' ;
+        const act = { actType: actType, data: this.currFish, collection: 'fishes' };
+        const params = { event:e,askFrom:'server',getListBack:true};
+          this.sendMsg({ act,params});
         //  this.currFish = this.setCurrFish;
       },
     sendMsg(msg){
           this.$store.dispatch({ type: SENDMSG, msg })
-    },
-    sendLocalMsg(msg){//msgs to the store
-          this.$store.dispatch({ type: SENDLOCALMSG, msg })
     },
   },
 }

@@ -76,9 +76,9 @@ function dbConnect() {
 
 
 // POST - adds 
-app.post('/data/:objType', upload.single('file'), function (req, res) {
+app.post('/data/:objType', upload.single('file'), function (req,res) {
 	const objType = req.params.objType;
-	mainHub(req, res);
+	mainHub(req,res);
 });
 
 
@@ -93,13 +93,11 @@ function addRecord(obj, type1){
 			if (err) {
 				cl(`addRecord.Couldnt insert a new ${type1}`, err)
 				reject ({status:'err',err:err})
-				// res.json(500, { error: 'Failed to add' })
 			} else {
 				cl('addRecord.'+ type1 + " added:"+ obj);
 				obj.status='success';
 				
 				resolve ({status:'success',obj})
-				// res.json(obj);
 			}
 			db.close();
 		});
@@ -199,28 +197,30 @@ function getCountId(){
 }
 
 //============================================================
-function addToList(req, res){
-	const obj = req.body.msg.act.data;
-	var collection = req.body.msg.act.collection;
-	addRecord(obj,collection).then(function(arg){
+function addToList(act,req,res){
+	var acts = req.acts
+	const obj = acts[0].data;
+	var list = acts[0].list;
+	addRecord(obj,list).then(function(arg){
 			if (arg.status==='err') {
 				res.json(500, { error: 'Failed to add' })
 			} else {
-				arg.obj.status='success';
-				res.json(arg.obj);
+				var act =req.acts[0] 
+				act.res = arg.status;
+				mainHub2(act,req,res);
 			}
 	})
 }
 //============================================================
-function getList(req, res){
-	const list = req.body.msg.act.list;
-	const criteria = req.body.msg.act.criteria;
-	
+function getList(act,req,res){
+	const list =act.list;
+	const criteria = (act.criteria)? act.criteria:{};
 	getListFromDb(list,criteria).then(function(list){
 			if (list.status==='err') {
 				res.json(500, { error: 'Failed to add' })
 			} else {
-				res.json(list.objs);
+				act.res= list.objs;
+				mainHub2(act,req,res)
 			}
 	})
 }
@@ -244,17 +244,17 @@ function getListFromDb(type1,criteria){
 	})
 }
 //============================================================
-function updateInList(req, res){
-	const userId = req.body.msg.act.user;
-	// const list 	= 'users';
-	const list = req.body.msg.act.list;
-	const newObj 	= req.body.msg.act.data;
+function updateInList(act,req,res){
+	const list =act.list;
+	const objId = act.objId;
+	const newObj 	= act.newObj;
 	
-	updateRecordInDb(list,userId,newObj).then(function(dbRes){
+	updateRecordInDb(list,objId,newObj).then(function(dbRes){
 			if (dbRes.status==='err') {
 				res.json(500, { error: 'Failed to add' })
 			} else {
-				res.json(dbRes.user);
+				act.res= dbRes.user;
+				responseToClient(res,dbRes.user);
 			}
 	})
 }
@@ -286,29 +286,19 @@ function updateRecordInDb(list,userId,newObj){
 	});
 }
 //============================================================
-function deleteFromList(req, res){
-	const objId = req.body.msg.act.objId;
-	var getListBack = req.body.msg.params.getListBack;
-	const list = req.body.msg.act.list;
+function deleteFromList(act,req,res){
+	const objId = act.objId;
+	const list = act.list;
 	deleteRecordFromDb(list,objId).then(function(dbRes){
 			if (dbRes.status==='err') {
 				res.json(500, { error: 'Failed to delete' })
 				// reject ({status:'err updating failed',err:err})
 			} else {
-				if(getListBack){
-					res.msg= 'ok';
-					// getList(req, res);
-					res.json(dbRes.status);
-				}else
-					res.json(dbRes.status);
+				act.res= dbRes.status;
+				mainHub2(act,req,res)
 			}
 	})
 }
-//============================================================
-function responseToClient(res,msgToClient){
-	res.json(msgToClient);
-}
-
 //============================================================
 function deleteRecordFromDb(list,objId){
 	cl(`Requested to DELETE the ${list} with id: ${objId}`);
@@ -329,50 +319,63 @@ function deleteRecordFromDb(list,objId){
 			});
 	});
 }
-
 //============================================================
-function mainHub(req, res){
-	const actType = req.body.msg.act.actType;
+function cloneDeep(obj){
+      var myJSON = JSON.stringify(obj);
+      return JSON.parse(myJSON)
+}
+//============================================================
+function mainHub(req,res){//orgeize the action before start looping it in mainHub1
+	 req.acts = {};
+	 res.acts = {};
+	 if (!Array.isArray(req.body.msg.acts)){  //1 of action recived=>convert to array with 1 obj
+	 		var obj = cloneDeep(req.body.msg)
+			 req.msg = {};
+			 req.msg.acts = [obj];
+	 }	
+			req.acts = req.body.msg.acts;
+			res.acts = [];
+			var act = req.acts[0]
+			mainHub1(act,req,res)
+	 
+}
+//============================================================
+function mainHub2(act,req,res){	//orgeize the action after every loop
+		var obj = cloneDeep(req.acts[0])
+		req.acts.splice(0,1);
+		res.acts.push(obj);
+		var act = req.acts[0];
+	 if(req.acts.length >0) {
+		mainHub1(act,req,res);
+	 }else{
+		 responseToClient(res);
+	 }
+}
+//============================================================
+function mainHub1(act,req,res){
+	
+	req.act =req.acts[0] 
+	const actType =req.act.actType;
 		switch (actType) {
 			case 'addToList':
-				addToList(req, res);
+				addToList(act,req,res);
 			break;
 			case 'getList':  //
-				getList(req, res);
+				getList(act,req,res);
 			break;
 			case 'deleteFromList':  //
-				deleteFromList(req, res);
+				deleteFromList(act,req,res);
 			break;
 			case 'updateInList':  //
-				updateInList(req, res);
+				updateInList(act,req,res);
 			break;
 		}
 }
 //============================================================
-// // PUT - updates
-// app.put('/data/:objType/:id', function (req, res) {
-// 	const objType 	= req.params.objType;
-// 	const objId 	= req.params.id;
-// 	const newObj 	= req.body;
-// 	if (newObj._id && typeof newObj._id === 'string') newObj._id = new mongodb.ObjectID(newObj._id);
-
-// 	cl(`Requested to UPDATE the ${objType} with id: ${objId}`);
-// 	dbConnect().then((db) => {
-// 		const collection = db.collection(objType);
-// 		collection.updateOne({ _id: new mongodb.ObjectID(objId) }, newObj,
-// 			(err, result) => {
-// 				if (err) {
-// 					cl('Cannot Update', err)
-// 					res.json(500, { error: 'Update failed' })
-// 				} else {
-// 					res.json(newObj);
-// 				}
-// 				db.close();
-// 			});
-// 	});
-// });
-
-
+function responseToClient(res,msgToClient){
+	res.json(res.acts);
+}
+//============================================================
 // Kickup our server 
 // Note: app.listen will not work with cors and the socket
 // app.listen(3003, function () {
@@ -447,16 +450,3 @@ io.on('connection', function (socket) {
 
 
 
-// Some small time utility functions
-
-
-
-
-// function cl(...params) {
-// 	console.log.apply(console, params);
-// }
-
-// Just for basic testing the socket
-// app.get('/', function(req, res){
-//   res.sendFile(__dirname + '/test-socket.html');
-// });

@@ -1,8 +1,7 @@
 
 export const SND_MSG = 'SND_MSG';
 export const LOG_IN = 'LOG_IN';
-export const SENDMSG = 'SENDMSG';//
-export const SENDLOCALMSG = 'SENDLOCALMSG';//
+export const SENDMSG = 'SENDMSG';
 
 import service from '../services/service'
 
@@ -59,31 +58,39 @@ const getters = {
   }
 
 }
+
 const mutations = {
 
   [SENDMSG](state, payload) {
-    var acts = payload.res
-    for (var i = 0; i < acts.length; i++) {
-      var act = acts[i];
-      var actType = act.actType;
-      switch (actType) {
-        case 'setUser'://    
-          state.user = act.res;
-        break;
-        case 'addToList'://    
-          var list = act.list
-          state[list] = act.res;
-        break;
-        case 'getList'://    
-          var list = act.list
-          state[list] = act.res;
-        break;
-        case 'updateInList'://    
-          var list = act.list
-          state[list] = act.res;
-        break;
-      }
+    var actType = payload.msg.act.actType;
+    if(payload.msg.params.getListBack){
+      
     }
+    switch (actType) {
+			case 'setUser'://    
+				console.log('store.SENDMSG.setUser');
+        var obj1 = payload.msg.act.user;
+        state.user = obj1;
+			break;
+			case 'addToList'://    
+				console.log('store.SENDMSG.addToList');
+        var obj1 = payload.res;
+        var list = payload.msg.act.list
+        state[list] = obj1;
+			break;
+			case 'getList'://    
+				console.log('store.SENDMSG.agetList');
+        var objs = payload.res;
+        var list = payload.msg.act.list
+        state[list] = objs;
+			break;
+			case 'updateInList'://    
+				console.log('store.SENDMSG.updateUser');
+        var user = payload.msg.act.data;
+        state.user = user;
+			break;
+    }
+
 
   },
   [LOG_IN](state, { user }) {
@@ -108,16 +115,26 @@ const mutations = {
 }
 
 const actions = {//
+
+  [LOG_IN](context, payload) {
+    console.log('store.LOG_IN:', payload)
+    var prm = service.logIn(payload);
+    prm.then(res => {
+      payload.user = res;
+      context.commit(payload);
+    })
+  },
   [SENDMSG](context, payload) {
+    if(payload.msg.params.askFrom === 'server'){
         var prm = service.sendMsg(payload);
         return prm.then(res => {
           payload.res = res;
           context.commit(payload);
       });
-  },
-  [SENDLOCALMSG](context, payload) {
-    //go directly to mutations
+    }else{//go directly to mutations
           context.commit(payload);
+    }
+    
   },
 
 
