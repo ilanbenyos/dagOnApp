@@ -253,8 +253,8 @@ function updateInList(act,req,res){
 			if (dbRes.status==='err') {
 				res.json(500, { error: 'Failed to add' })
 			} else {
-				act.res= dbRes.user;
-				responseToClient(res,dbRes.user);
+				act.res= dbRes.res;
+				mainHub2(act,req,res)
 			}
 	})
 }
@@ -277,8 +277,8 @@ function updateRecordInDb(list,userId,newObj){
 
 								reject({ error: 'Update failed' })
 							} else {
-								console.log('result:', result.value)
-								resolve ({status:'success',user:result.value})
+								var res= result.value;
+								resolve ({res})
 							}
 							db.close();
 						});
