@@ -59,6 +59,18 @@ const getters = {
   }
 
 }
+function getObjById(objId,arr) {
+      var arr1 = this[arr];
+      var obj = arr.find(function (obj1) {
+          return (objId === obj1._id)
+      })
+      return obj
+}
+function getIdxById(objId,arr) {
+      index = state[arr].findIndex(item => item._id==objId);
+      return index
+}
+
 const mutations = {
 
   [SENDMSG](state, payload) {
@@ -72,15 +84,19 @@ const mutations = {
         break;
         case 'addToList'://    
           var list = act.list
-          state[list] = act.res;
+          // state[list] = act.res;
+          state[list].splice(0,state[list].length, act.res);
+        
         break;
         case 'getList'://    
           var list = act.list
           state[list] = act.res;
         break;
-        case 'updateInList'://    
+        case 'updateInList':// 
+          //  var idx= getIdxById(act.id,act.list);
           var list = act.list
-          state[list] = act.res;
+          var idx = state[list].findIndex(item => item._id==act.id);
+          state[list][idx] = act.res;
         break;
       }
     }
