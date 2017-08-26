@@ -246,8 +246,8 @@ function getListFromDb(type1,criteria){
 //============================================================
 function updateInList(act,req,res){
 	const list =act.list;
-	const objId = act.objId;
 	const newObj 	= act.newObj;
+	const objId = newObj._id;
 	
 	updateRecordInDb(list,objId,newObj).then(function(dbRes){
 			if (dbRes.status==='err') {

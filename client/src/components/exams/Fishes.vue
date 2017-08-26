@@ -1,10 +1,23 @@
 <template>
   <section>
-        <button class="button" @click="getList('fishes',{},$event)">updateFishes</button>
-    fishes.length: {{fishes.length}}
     <div class = "table flex col">
-        <div class= "list-item" v-for="(fish,idx) in fishes">
-            <div class="field flex row">
+        <div  class= "list-item" v-for="(fish,idx) in fishes">
+            <div v-if="fish.mode =='edit'" class="field flex row">
+                <!--<div class="field flex row id"><div class="field">id:</div><div class="field">{{fish._id}}</div></div>-->
+                <div class="field flex row name"><div class="field">name:</div>
+                        <input class="input" v-model="fish.name"></input></div>
+                <div class="field flex row nameHeb"><div class="field">heb:</div>
+                        <input class="input" v-model="fish.nameHeb"></input></div>
+                <div class="field flex row nameShort"><div class="field">short:</div>
+                        <input class="input" v-model="fish.nameShort"></input></div>
+                <div  class="buttons-pnl new-record">
+                    <button  class="button update-btn" @click="saveNewRecord('fishes',fishes[idx],$event)">save</button>
+                    <button class="button save-btn" @click="deleteFromList('fishes',fish._id)">delete</button>
+                    <button v-if="fish.mode==='edit'" class="button" @click="cancelAction('fishes',fish._id,$event)">cancel</button>
+                   - {{fish.mode}}-
+                </div>
+            </div>
+            <div v-else class="field flex row">
                 <!--<div class="field flex row id"><div class="field">id:</div><div class="field">{{fish._id}}</div></div>-->
                 <div class="field flex row name"><div class="field">name:</div>
                         <input disabled class="input" v-model="fish.name"></input></div>
@@ -12,14 +25,8 @@
                         <input disabled class="input" v-model="fish.nameHeb"></input></div>
                 <div class="field flex row nameShort"><div class="field">short:</div>
                         <input disabled class="input" v-model="fish.nameShort"></input></div>
-                <div v-if="fish.mode !='newRecord'" class="buttons-pnl">
-                    <button  class="button update-btn" @click="updateInList('fishes',fish._id,$event)">update</button>
-                    <button class="button save-btn" @click="deleteFromList('fishes',fish._id)">delete</button>
-                    <button v-if="fish.mode==='edit'" class="button" @click="cancelAction('fishes',fish._id,$event)">cancel</button>
-                    {{fish.mode}}
-                </div>
-                <div v-else class="buttons-pnl new-record">
-                    <button class="button" @click="saveRecord('fishes',fishes[idx])">save</button>
+                <div  class="buttons-pnl ">
+                    <button class="button" @click="updateRecord('fishes',fishes[idx])">update </button>
                     <button class="button" @click="deleteFromList('fishes',fish._id)">delete</button>
                 </div>
             </div>
@@ -27,10 +34,9 @@
     </div>
 
     <div >{{currFish}}</div>
-    <div v-if="currFish">
         <button class="button" @click="addNewLocalRecord('fishes')">add new</button>
-        <button class="button" @click="submit">submit</button>
-    </div>
+        <button class="button" @click="saveAll(fishes,'fishes')">save all</button>
+        <button class="button" @click="getList('fishes',{},$event)">updateFishes</button>
   </section>
 </template>
 <script>
@@ -64,7 +70,20 @@ export default {
         fishes1() {return this.$store.getters.fetchGetFishes;},
     },
   methods: {//
-      saveRecord(list,obj,e){
+      saveAll(list,listName){
+        for (var i = 0; i < list.length; i++) {
+            list[i].mode = 'saved';
+            const acts =[
+                    { actType: 'updateInList', newObj: list[i], list:listName,askFrom:'server' },
+                        ]
+            this.sendMsg( {acts});
+        }                   
+      },
+      updateRecord(list,obj){
+          var tttt = "hhhh"
+        obj.mode = 'edit';
+      },
+      saveNewRecord(list,obj,e){
             delete obj.mode;
             const acts =[
                     { actType: 'addToList', data: obj, list,askFrom:'server' },
@@ -73,19 +92,8 @@ export default {
             this.sendMsg( {acts});
       },
       addNewLocalRecord(arr){
-        var obj = {mode:'newRecord',mode :'edit'}
+        var obj = {mode :'edit'}
         this.fishes.push(obj);
-        var that = this;
-        setTimeout(function() {
-                var elList= document.getElementsByClassName("list-item");//save-btn
-                var parentEl = elList[elList.length-1]
-                var buttonEl= parentEl.getElementsByClassName("update-btn")[0];//save-btn
-                    buttonEl.innerText = 'save';
-                var inputNodes = parentEl.getElementsByTagName('INPUT');//
-                that.toggleDisable(inputNodes,false)
-        }, 3);
-
-
       },
       getList(list,criteria){
             const acts =[{ actType: 'getList', list:list, criteria:{} }];
@@ -133,19 +141,6 @@ export default {
             delete obj.mode;
 
       },
-      saveRecord(parentEl,inputNodes,buttonEl,list,obj,e){
-        var newObj = this.getObjById(obj._id,this.fishes);
-        delete newObj.mode;
-       var id =  obj._id;
-        const acts =[
-                        { actType: 'updateInList', list,id,newObj },
-                        { actType: 'getList', list, criteria:{}}
-                    ]
-        this.sendMsg({acts});
-        this.cancelAction(list,obj._id,e)
-//==============================
-
-      },
       updateMode(parentEl,inputNodes,buttonEl,list,obj,e){
         for (var i = 0; i < inputNodes.length; i++) {
                inputNodes[i].disabled = false;
@@ -153,13 +148,6 @@ export default {
         parentEl.classList.add('updateMode');
         buttonEl.innerText = 'save';
         obj.mode = 'edit';
-      },
-    submit(e){
-        // var actType = (typeof(this.currFish._id== 'undefined'))?'addToList': 'updateInList' ;
-        // const act = { actType: actType, data: this.currFish, collection: 'fishes' };
-        // const params = { event:e,askFrom:'server',getListBack:true};
-        //   this.sendMsg({ act,params});
-        //  this.currFish = this.setCurrFish;
       },
     sendMsg(msg){
           this.$store.dispatch({ type: SENDMSG, msg })
