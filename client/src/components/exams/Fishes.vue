@@ -11,9 +11,13 @@
                 <div class="field flex row nameShort"><div class="field">short:</div>
                         <input class="input" v-model="fish.nameShort"></input></div>
                 <div  class="buttons-pnl new-record">
-                    <button  class="button update-btn" @click="saveNewRecord('fishes',fishes[idx],$event)">save</button>
-                    <button class="button save-btn" @click="deleteFromList('fishes',fish._id)">delete</button>
-                    <button v-if="fish.mode==='edit'" class="button" @click="cancelAction('fishes',fish._id,$event)">cancel</button>
+                    <button  class="button update-btn" 
+                            @click="saveNewRecord('fishes',fishes[idx],$event)">save </button>
+                    <button class="button save-btn" 
+                            @click="deleteFromList('fishes',fish._id)">delete</button>
+                    <button v-if="fish.mode==='edit'" class="button" 
+                            @click="cancelEditing(fishes[idx])">cancel</button>
+                            <!--@click="cancelEditing('fishes',fish._id,$event,idx)">cancel</button>-->
                    - {{fish.mode}}-
                 </div>
             </div>
@@ -26,6 +30,8 @@
                 <div class="field flex row nameShort"><div class="field">short:</div>
                         <input disabled class="input" v-model="fish.nameShort"></input></div>
                 <div  class="buttons-pnl ">
+                    <b-button variant='primary'>dffsg
+                    </b-button>
                     <button class="button" @click="updateRecord('fishes',fishes[idx])">update </button>
                     <button class="button" @click="deleteFromList('fishes',fish._id)">delete</button>
                 </div>
@@ -46,6 +52,8 @@
 import { TYPE_OXYGEN } from '../../constants/actTypes'
 import { SENDMSG } from '../../store/store'
 import moment from 'moment'
+
+
 export default {
   name: 'Grading',
   data() {
@@ -129,16 +137,18 @@ export default {
                 inputNodes[i].disabled = bul;
             }
       },
-      cancelAction(list,objId,e){
-        var parentEl= e.path[2];
-            parentEl.classList.remove('updateMode');
-        var buttonEl= parentEl.getElementsByClassName("update-btn")[0];//save-btn
-            buttonEl.innerText = 'update';
-        var inputNodes = parentEl.getElementsByTagName('INPUT');//
-            this.toggleDisable(inputNodes,true);
-            var obj = this.getObjById(objId,this.fishes);
-            obj.mode = false
-            delete obj.mode;
+      cancelEditing(obj){
+        obj.mode = 'saved';
+        
+        // var parentEl= e.path[2];
+        //     parentEl.classList.remove('updateMode');
+        // var buttonEl= parentEl.getElementsByClassName("update-btn")[0];//save-btn
+        //     buttonEl.innerText = 'update';
+        // var inputNodes = parentEl.getElementsByTagName('INPUT');//
+        //     this.toggleDisable(inputNodes,true);
+        //     var obj = this.getObjById(objId,this.fishes);
+        //     obj.mode = false
+        //     delete obj.mode;
 
       },
       updateMode(parentEl,inputNodes,buttonEl,list,obj,e){

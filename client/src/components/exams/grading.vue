@@ -1,24 +1,21 @@
 <template>
   <section>
-    <button>Grading</button>
-    facilities.length: {{facilities.length}}
-    ponds.length: {{state.ponds.length}}
-    <table>
-      <tr>
-        <th>Ponds</th>
-        <th>{{getTheTime()}}</th>
-      </tr>
-      <tr v-for="pond in currFacility.ponds" :key="pond.id">
-        <td>{{pond.id}}</td>
-        <td 
-        v-if="act.type === TYPE_OXYGEN"
-        v-for="act in pond.acts" :key="act.id">{{act.val}}</td>
-      </tr>
-      <tr>
-        <td>Jane</td>
-        <td>Doe</td>
-      </tr>
-    </table>
+    <button @click="creatExam">Grading</button>
+      
+      <div class="field flex row">
+          <div class="field">{{currNum2}}</div>
+          <div class="field">-</div>
+          <div class="field">{{currNum1}}</div>
+          <div class="field">=</div>
+          <input class="input" v-model="res"></input>
+          <button @click="resExam">פתור!!</button>
+      </div>
+        <div  class= "field flex row " v-for="(exam,idx) in exams">
+          <div class="field">{{idx+1}}: {{exam.num2}}-{{exam.num1}} = {{exam.num2-exam.num1}}</div>
+          <div v-if="((exam.num2-exam.num1) === exam.enterdrRes)" class="field">נכון</div> 
+          <div v-else class="field">לא נכון</div>
+      </div>
+     == {{answers.currects}}/{{answers.wrongs}}==
   </section>
 </template>
 <script>
@@ -28,29 +25,66 @@ export default {
   name: 'Grading',
   data() {
     return {
-      tempFacilities:[ { id:1, name:'harta', ponds:[ { id:1, facility:1, vol:20, acts:[{id:1, date:new Date(), pond:1, type:TYPE_OXYGEN, time:6, val:10},{id:2, date:new Date(), pond:1, type:TYPE_OXYGEN, time:12, val:11}] } ] } ],
-      currFacility:1,
-      TYPE_OXYGEN:TYPE_OXYGEN,
-      state:this.$store.getters.fetchGetState,
-      ponds:this.$store.getters.fetchGetPonds,
-      facilities:this.$store.getters.fetchGetFacilities,
+      exams:[],
+      minNum:10,
+      maxNum:30,
+      currNum1:0,
+      currNum2:0,
+      res:null,
+      exams:[],
+      answers:{currects:0, wrongs:0}
+      
     }
   },
   created () {
-    this.currFacility = this.tempFacilities[0];
+    this.creatExam()
   },
   methods: {
-  getTheTime(){
-    return moment().format('HH:mm');
+    getRandNum(min,max){
+      return (Math.floor(Math.random() * max) + min) 
     },
+    creatExam(){
+       var num1 = this.getRandNum(this.minNum,this.maxNum);
+       var num2 = this.getRandNum(this.minNum,this.maxNum);
+       this.currNum1 =num1;
+       this.currNum2 =num2;
+       if(num1>num2){
+          this.currNum2 =num1;
+          this.currNum1 =num2;
+       }
+      //  this.res = num1-num2;
+       },
+       resExam(){
+         var num1=this.currNum1;
+         var num2=this.currNum2;
+         var currectRes = num2 -num1;
+         var enterdrRes = +this.res;
+         (enterdrRes ==currectRes)?this.answers.currects++ : this.answers.wrongs++;
+          var obj = {num1,num2,enterdrRes}
+          this.exams.push(obj);
+          this.res = null;
+          this.creatExam();
+    }
   },
 }
 </script>
 <style scoped>
-  th{
-    border: 1px solid black;
-  }
-  td{
-    border: 1px solid black;
-  }
+.flex{
+  display: flex;
+}
+.row{
+  flex-direction: row;
+}
+.col{
+  flex-direction: column;
+}
+.field{
+    margin:.3em;
+    border:1px solid green;
+    font-size:1em;
+    /*width:4em;*/
+}
+*{
+  outline:1px solid red;
+}
 </style>
