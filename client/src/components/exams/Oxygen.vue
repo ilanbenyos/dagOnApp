@@ -3,7 +3,11 @@
     <table>
       <tr>
         <th>Ponds</th>
-        <th v-for="act in currFacility.ponds[0].acts" :key="act.id">{{act.time}}</th>
+        <th
+        v-if="!isActTimeChanging(act)"
+        v-for="act in currFacility.ponds[0].acts" :key="act.id"
+        @dblclick="toggleChangeTime(act)">{{act.time}}</th>
+        <th v-else><input type="text" v-model="tempTime" ></input></th>
         <th><pre>  {{actTime}}    </pre></th>
       </tr>
       <tr v-for="(pond,idx) in currFacility.ponds" :key="pond.id">
@@ -22,6 +26,9 @@
       </tr>
     </table>
     <button @click="finishCurrExams">Add Entry</button>
+    <button 
+    v-if="timeChangeAct"
+    @click="changeTime">Change time</button>
     <!-- <div v-if="isInputMode">input mode!
       <table>
         <tr>
@@ -45,11 +52,11 @@ export default {
       tempFacilities:[ { id:1, name:'harta', 
         ponds:[ { id:1, vol:20, 
           acts:[{id:1, date:new Date(), pond:1, type:TYPE_OXYGEN, time:6, val:10},
-          {id:2, date:new Date(), pond:1, type:TYPE_OXYGEN, time:6, val:11}
+          {id:2, date:new Date(), pond:1, type:TYPE_OXYGEN, time:12, val:11}
           ] },
           { id:2, vol:20, 
-          acts:[{id:1, date:new Date(), pond:1, type:TYPE_OXYGEN, time:6, val:10},
-          {id:2, date:new Date(), pond:1, type:TYPE_OXYGEN, time:6, val:11}
+          acts:[{id:2, date:new Date(), pond:1, type:TYPE_OXYGEN, time:6, val:10},
+          {id:2, date:new Date(), pond:1, type:TYPE_OXYGEN, time:12, val:11}
         ] },
         ] 
       } ],
@@ -57,30 +64,16 @@ export default {
       TYPE_OXYGEN:TYPE_OXYGEN,
       isInputMode:false,
       actTime:null,
-      tempActs:[]
+      tempActs:[],
+      timeChangeAct:false,
+      changeTimeFor:{},
+      tempTime:null
     }
   },
   methods: {
     getTheTime(){
       return moment().format('HH:mm');
     },
-    // addExam(){
-    //   console.log('adding exam!');
-    //   this.isInputMode = !this.isInputMode;
-    // }
-    // addPondAct(acts){
-    //   console.log('adding act to pond number:' + pondId);
-    //   if(this.actTime){
-    //     console.log('got the time!');
-    //   }
-    //   else{
-    //     currFacility.ponds[0].acts.push(examService.createActObj());
-    //     currFacility.ponds.forEach( pond =>{ 
-    //       pond.acts.push()
-    //     });
-    //   }
-    //   //examService.createActObj();
-    // },
     finishCurrExams(){
       console.log('finishing curr exams entries');
       this.tempActs.forEach( tmpAct =>{
@@ -88,7 +81,6 @@ export default {
         pond.acts.push(tmpAct);
         console.log('pond acts after push',pond.acts)
       });
-      //this.currFacili
     },
     addNewExam(){
       console.log('adding a new exam');
@@ -100,6 +92,28 @@ export default {
     },
     resaultAdded(value){
       console.log("saving the temporary resault:", value);
+    },
+    toggleChangeTime(act){
+      this.changeTimeFor ={
+        day:act.date.getDate(), 
+        month:act.date.getMonth(), 
+        year:act.date.getFullYear(), 
+        time:act.time
+      };
+      this.tempTime = act.time;
+      console.log('toggling change time input ',this.changeTimeFor);
+
+
+      this.timeChangeAct = true;
+    },
+    changeTime(){
+      examService.changeActsTimeTo(this.changeTimeFor,this.tempTime,this.currFacility);
+      this.timeChangeAct = false;
+    },
+    isActTimeChanging(act){
+      console.log('checking if the current act is changing its time by the user');
+
+      return examService.isActSameDateAndTime(act,this.changeTimeFor, this.acts);
     }
 
   },
