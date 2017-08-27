@@ -41,7 +41,7 @@ export default {
   text-align: center;
   color: #652456;
   background: rgba(230, 230, 230, 0.7);
-  max-width: 768px;
+  // max-width: 768px;
   height: 100%;
   ;
   margin: auto;

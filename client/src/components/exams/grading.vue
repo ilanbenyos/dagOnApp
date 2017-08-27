@@ -26,8 +26,8 @@ export default {
   data() {
     return {
       exams:[],
-      minNum:10,
-      maxNum:30,
+      minNum:20,
+      maxNum:50,
       currNum1:0,
       currNum2:0,
       res:null,
@@ -81,7 +81,7 @@ export default {
 .field{
     margin:.3em;
     border:1px solid green;
-    font-size:1em;
+    font-size:1.2em;
     /*width:4em;*/
 }
 *{

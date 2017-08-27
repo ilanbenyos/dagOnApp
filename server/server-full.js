@@ -199,9 +199,9 @@ function getCountId(){
 //============================================================
 function addToList(act,req,res){
 	var acts = req.acts
-	const obj = acts[0].data;
+	const newObj = acts[0].newObj;
 	var list = acts[0].list;
-	addRecord(obj,list).then(function(arg){
+	addRecord(newObj,list).then(function(arg){
 			if (arg.status==='err') {
 				res.json(500, { error: 'Failed to add' })
 			} else {
@@ -248,7 +248,7 @@ function updateInList(act,req,res){
 	const list =act.list;
 	const newObj 	= act.newObj;
 	const objId = newObj._id;
-	
+
 	updateRecordInDb(list,objId,newObj).then(function(dbRes){
 			if (dbRes.status==='err') {
 				res.json(500, { error: 'Failed to add' })
