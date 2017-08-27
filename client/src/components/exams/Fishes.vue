@@ -1,6 +1,8 @@
 <template>
   <section class= "section">
     <div class = "container flex col center-hor">
+
+        <div class= "main-header" >{{componentName}}</div>
         <div  class= "list-item outline1" v-for="(fish,idx) in fishes">
             <div v-if="idx === 0" class= "header self-al-start outline1 field flex row field-line" >
                 <div class="field header name hide1">Name:</div>
@@ -28,7 +30,7 @@
             </div>
             </div>
     </div>
-    <div  class="buttons-pnl margin-top-1 flex row center-hor">
+    <div  class="buttons-pnl margin-top-1 flex row center-ver">
                 <b-button variant='primary' @click="addNewLocalRecord('fishes')">
                     <b-tooltip :delay="tooltipDelay" content="add new record">
                         <i class="material-icons">add_box</i>
@@ -43,12 +45,6 @@
                         <i class="material-icons">refresh</i>
                 </b-tooltip>
             </b-button>
-            <b-button variant='primary' class="margin-sides1" @click="pageRecord(fish)">
-                <b-tooltip :delay="tooltipDelay" content="edit page">
-                        <i class="material-icons">mode_edit</i>
-                </b-tooltip>
-            </b-button>
-        <!--</b-button-group>-->
     </div>
            <!--====================MODAL========================-->
       <transition name="fade">
@@ -97,18 +93,17 @@
   </section>
 </template>
 <script>
-// require('../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap.scss')
-// import bootstrap from 'bootstrap'
-// s// import 'vue-material/dist/vue-material.css'
+
 import { TYPE_OXYGEN } from '../../constants/actTypes'
 import { SENDMSG } from '../../store/store'
 import moment from 'moment'
 
 
 export default {
-  name: 'Grading',
+  name: 'FishesList',
   data() {
     return {
+        componentName:'Fishes List',
       state:this.$store.getters.fetchGetState,
       ponds:this.$store.getters.fetchGetPonds,
       facilities:this.$store.getters.fetchGetFacilities,//fetchGetCurrFish
@@ -169,24 +164,10 @@ export default {
       addNewLocalRecord(arr){
         this.fish = {mode :'edit'};
         this.pageEdit =true;
-        // var obj = {mode :'edit'}
-        // var arr = this.fishes;
-        // arr.splice(arr.length,0,obj);//list-item
-        // var that = this
-        // setTimeout(function() {
-        //     var items = document.getElementsByClassName('list-item');
-        //     var parent = items[items.length-1];
-        //     var inputNodes = parent.getElementsByTagName('INPUT');;
-        //     that.toggleDisable(inputNodes,false)
-        // }, 20);
-
       },
       getList(list,criteria){
             const acts =[{ actType: 'getList', list:list, criteria:{} }];
             this.sendMsg({acts});
-      },
-      setCurrFish(){
-            this.currFish = {_id:null,name:'',nameHeb:'',nameShort:''}
       },
     getObjById(objId,arr) {
         var arr1 = this[arr];
@@ -203,30 +184,10 @@ export default {
             this.sendMsg({acts});
             this.closeModal();
       },
-    updateInList(list,objId,e){
-        var parentEl= e.path[2];//update-btn
-        var buttonEl= e.path[0];
-        var inputNodes = parentEl.getElementsByTagName('INPUT');//
-        var obj = this.getObjById(objId,this.fishes);
-        (parentEl.classList.contains('updateMode')) ? this.saveRecord(parentEl,inputNodes,buttonEl,list,obj,e): this.updateMode(parentEl,inputNodes,buttonEl,list,obj,e)
-            this.closeModal();
-      },
       toggleDisable(inputNodes,bul){
             for (var i = 0; i < inputNodes.length; i++) {
                 inputNodes[i].disabled = bul;
             }
-      },
-      cancelEditing(e,obj){
-        obj.mode = 'saved';
-        this.toggleField(e,true)
-      },
-      updateMode(parentEl,inputNodes,buttonEl,list,obj,e){
-        for (var i = 0; i < inputNodes.length; i++) {
-               inputNodes[i].disabled = false;
-        }
-        parentEl.classList.add('updateMode');
-        buttonEl.innerText = 'save';
-        obj.mode = 'edit';
       },
     sendMsg(msg){
           this.$store.dispatch({ type: SENDMSG, msg })
@@ -248,9 +209,10 @@ export default {
     height: calc(100% - 170px);
     overflow-y: scroll;
     padding-right: 27px;
+    padding:10px;
     /*height: calc(100vh - 10em);*/
    /*background-color: yellow;*/
-    border:1px solid green;
+    /*border:1px solid green;*/
 }
 .modal{
     position:fixed;
@@ -276,6 +238,11 @@ export default {
     height:100%;
     background-color: gray;
     opacity: .5;
+}
+.main-header{
+    font-size: 2.5em;
+    color: #6d0c62;
+    font-weight:900;
 }
 .flex{
   display: flex;
@@ -326,8 +293,11 @@ input{
 }
 .center-hor{
     align-items: center;
+}
+.center-ver{
     justify-content:center;
 }
+
 .margin-top-1{
     margin-top:10px;
 }
@@ -344,7 +314,6 @@ input{
 .header{
     color:black;
     font-weight: bold;
-    
 }
 .input {
     font-size:1em;
@@ -386,7 +355,9 @@ input{
 .fade-enter, .fade-leave-to {
   opacity: 0
 }
-
+.space-around{
+    justify-content:space-around;
+}
 *{
     /*border:1px solid green;*/
 }
