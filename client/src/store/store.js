@@ -19,14 +19,11 @@ const state = {
   facilities:[],
   fishes:[],
   batches:[],
+  graders:[],
   fish:''
 };
 
 const getters = {
-  fetchUsersMatched(state) {
-    console.log('store.getters.USERS_MATCHED', state.usersMatched)
-    return state.usersMatched;
-  },
   fetchGetMsg(state) {
     return state.storeMsg;
   },
@@ -41,6 +38,9 @@ const getters = {
   },
   fetchGetPonds(state) {
     return state.ponds;
+  },
+  fetchGetGraders(state) {
+    return state.graders;
   },
   fetchGetFacilities(state) {
     return state.facilities;

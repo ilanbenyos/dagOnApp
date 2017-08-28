@@ -7,6 +7,8 @@ import Splash from '@/pages/Splash'
 import Login from '@/pages/Login'
 import Oxygen from '@/components/exams/Oxygen'
 import Grading from '@/components/exams/Grading'
+import Facilities from '@/components/exams/Facilities'
+import Graders from '@/components/exams/Graders'
 import Fishes from '@/components/exams/Fishes'
 // import Grading from '@/components/exams/Grading'
 // import Grading from '@/components/exams/Grading'
@@ -40,6 +42,14 @@ export default new Router({
       path: '/grading',
       name: 'Grading',
       component: Grading
+    },{
+      path: '/graders',
+      name: 'Graders',
+      component: Graders
+    },{
+      path: '/facilities',
+      name: 'Facilities',
+      component: Facilities
     },{
       path: '/fishes',
       name: 'Fishes',

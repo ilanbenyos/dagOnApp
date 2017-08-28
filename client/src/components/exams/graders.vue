@@ -2,46 +2,44 @@
   <section class= "section">
       <!--{{mixins.getIdxById1('rrr')}}-->
     <div class = "container flex col center-hor">
-
+=={{list.length}}==
         <div class= "main-header" >{{componentName}}</div>
-        <div  class= "list-item outline1" v-for="(fish,idx) in fishes">
+        <div  class= "list-item outline1" v-for="(item,idx) in list">
             <div v-if="idx === 0" class= "header self-al-start outline1 field flex row field-line" >
                 <div class="field header name hide1">Name:</div>
-                <div class="field nameHeb hide1">Heb</div>
-                <div class="field nameShort hide1">Short</div>
+                <div class="field nameHeb hide1">mm</div>
             </div>
             <div class="field flex row col1 ">
                 <div class="field-line flex col1 eeeee ">
                     <div class="field flex col ">
                             <div class="field header show1">Name:</div>
-                            <b-form-input size="lg" disabled class="input name" v-model="fish.name"></b-form-input></div>
+                                <b-form-input size="lg" disabled class="input name" v-model="item.name"></b-form-input>
+                    </div>
                     <div class="field flex col ">
-                            <div class="field header show1">שם עברי:</div>
-                            <b-form-input size="lg" disabled class="input nameHeb" v-model="fish.nameHeb"></b-form-input></div>
-                    <div class="field flex col ">
-                            <div class="field header show1">short:</div>
-                            <b-form-input size="lg" disabled class="input nameShort" v-model="fish.nameShort"></b-form-input></div>
-                    <b-button variant='warning' class="margin-sides1" @click="editRecord(fish)">
+                            <div class="field header show1">mm</div>
+                                <b-form-input size="lg" disabled class="input nameHeb" v-model="item.mm"></b-form-input>
+                    </div>
+                    <b-button variant='warning' class="margin-sides1" @click="editRecord(item)">
                         <b-tooltip :delay="tooltipDelay" content="edit page">
                                 <i class="material-icons">mode_edit</i>
                         </b-tooltip>
                     </b-button>
-                    
+
                 </div>
             </div>
             </div>
     </div>
     <div  class="buttons-pnl margin-top-1 flex row center-ver">
-                <b-button variant='primary' @click="addNewLocalRecord('fishes')">
+                <b-button variant='primary' @click="addNewLocalRecord(listName)">
                     <b-tooltip :delay="tooltipDelay" content="add new record">
                         <i class="material-icons">add_box</i>
                     </b-tooltip>
                 </b-button>
             <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="save all">
-                <b-button  size="lg" variant='primary' @click="saveAll(fishes,'fishes')">save all</b-button>
+                <b-button  size="lg" variant='primary' @click="saveAll(list,listName)">save all</b-button>
             </b-tooltip>
             
-            <b-button variant='primary' @click="getList('fishes',{},$event)">
+            <b-button variant='primary' @click="getList(listName,{},$event)">
                 <b-tooltip :delay="tooltipDelay" content="refresh list">
                         <i class="material-icons">refresh</i>
                 </b-tooltip>
@@ -52,27 +50,27 @@
             <div  v-on:click="closeModal"  v-if="pageEdit" class="modal" >
                 <div v-on:click.stop="pageEdit=true" class="inner-modal flex col center-hor ">
                    <!--=========================-->
+                    <div class= "main-header" >New Grader</div>
                     <div   class="field-line flex col form">
                         <div class="field  col ">
                                 <div class="field header">Name:</div>
-                                <b-form-input size="lg" class="input" v-model="fish.name"></b-form-input></div>
+                                <b-form-input size="lg" class="input" v-model="item.name"></b-form-input>
+                        </div>
                         <div class="field  col ">
-                                <div class="field header ">שם עברי:</div>
-                                <b-form-input size="lg" class="input" v-model="fish.nameHeb"></b-form-input></div>
-                        <div class="field  col ">
-                                <div class="field header">short:</div>
-                                <b-form-input size="lg" class="input" v-model="fish.nameShort"></b-form-input></div>
+                                <div class="field header ">mm:</div>
+                                <b-form-input size="lg" class="input" v-model="item.mm"></b-form-input>
+                        </div>
                     <!--===========BUTTONS PANNEL========-->
                     <div  class="buttons-pnl">
                         <b-button variant='primary'  
-                            @click.stop="saveRecord('fishes',fish,$event)">
+                            @click.stop="saveRecord(listName,item,$event)">
                             <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="backup">
                                     <i  class="material-icons">backup</i>
                             </b-tooltip>
                         </b-button>
                         
                         <b-button variant='danger'  
-                                    @click.stop="deleteFromList('fishes',fish._id,$event)">
+                                    @click.stop="deleteFromList('listName',item._id,$event)">
                                 <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="delete">
                                     <i class="material-icons">delete_forever</i>
                                 </b-tooltip>
@@ -100,43 +98,45 @@ import moment from 'moment'
 
 
 export default {
-  name: 'FishesList',
+  name: 'Graders',
   data() {
     return {
     //   mixins: [mixins],
-      arr:[{id:1,name:'ilan'},{id:2,name:'noam'}],
-      componentName:'Fishes List',
+      componentName:'Graders list',
       state:this.$store.getters.fetchGetState,
       ponds:this.$store.getters.fetchGetPonds,
-      facilities:this.$store.getters.fetchGetFacilities,//fetchGetCurrFish
-      fishes:this.$store.getters.fetchGetFishes,
-      currFish:{},
+      facilities:this.$store.getters.fetchGetFacilities,//
       pageMode:'readOnly',
       editMode:false,
       pageEdit:false,
       tooltipDelay:700,
-      fish: ''
+      fetchList:this.$store.getters.fetchGetGraders,//need to be changed!!
+      list:[],
+      listName:'graders',//need to be changed!!
+      item: '',
     }
   },
   created () {
-        this.getList('fishes',{})
+        this.getList(this.listName,{});
+        console.log('graders.created.getList',this.listName)
+        this.list = this.fetchList;
   },
     watch:{
-      fishes1: function(newFishes){
-        this.fishes = this.$store.getters.fetchGetFishes;
+      list1: function(newList){
+        this.list = this.fetchList;
       },
     },
     computed: {
-        fishes1() {return this.$store.getters.fetchGetFishes;},
+        list1() {return this.fetchList},
     },
   methods: {//
     //   getObjById1:mixins.getObjById1,
   closeModal(){
             this.pageEdit =false;
   },
-      editRecord(fish){
+      editRecord(item){
             this.pageEdit =!this.pageEdit;
-            this.fish = fish;
+            this.item = item;
       },
         toggleField(e,bul){
             var parent = e.path[5];
@@ -165,11 +165,12 @@ export default {
                 this. closeModal()
       },
       addNewLocalRecord(arr){
-        this.fish = {mode :'edit'};
+        this.item = {mode :'edit'};
         this.pageEdit =true;
       },
-      getList(list,criteria){
-            const acts =[{ actType: 'getList', list:list, criteria:{} }];
+      getList(listName,criteria){
+            console.log('graders.getList', listName)
+            const acts =[{ actType: 'getList', list:listName, criteria:{} }];
             this.sendMsg({acts});
       },
     getObjById(objId,arr) {

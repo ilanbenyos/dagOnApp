@@ -8,17 +8,29 @@
 </template>
 <script>
 import MainNav from '@/components/MainNav';
-
+import { SENDMSG } from './store/store';
 export default {
   name: 'app',
   data() {
     return {
       msg:'App.vue',
+      listsToUpload:['graders','fishes','facilities']
     }
   },
     created() {
+      this.getLists()
     },
     methods: {
+      sendMsg(msg){
+          this.$store.dispatch({ type: SENDMSG, msg })
+      },
+      getLists(){
+        const acts = this.listsToUpload.map(function (listName) {
+           return { actType: 'getList', list:listName, criteria:{} } 
+          });
+          this.sendMsg({acts});
+      },
+
     },
   components: {
     MainNav,

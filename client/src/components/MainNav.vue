@@ -4,7 +4,9 @@
     <button class="button" @click="goToCard">goToCard</button>
     <router-link to="/oxygen"><button>Go to oxygen exam</button></router-link>
     <router-link to="/Grading"><button>Grading</button></router-link>
+    <router-link to="/Graders"><button>Graders</button></router-link>
     <router-link to="/Fishes"><button>fishes</button></router-link>
+    <router-link to="/Facilities"><button>Facilities</button></router-link>
   </div>
 </template>
 
