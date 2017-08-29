@@ -1,38 +1,48 @@
 <template>
   <section class= "section">
-    <div class = "container flex col center-hor">
         <div class= "main-header" >{{componentName}}</div>
-        <div  class= "list-item outline1" v-for="(item,idx) in list">
-            <div v-if="idx === 0" class= "header self-al-start outline1 field flex row field-line" >
-                <div class="field header name hide1">Name:</div>
-                <div class="field width10 hide1">שם</div>
-                <div class="field width5 hide1">short</div>
-                <div class="field width5 hide1">מקוצר</div>
+            <div  class= "header self-al-start outline1 field flex row field-line" >
+                <div class="field width3 hide1">idx</div>
+                <div class="field width10 name hide1">Name:</div>
+                <div class="field width10 hide1">facility</div>
+                <div class="field width5 hide1">volume</div>
+                <div class="field width5 hide1">idx</div>
             </div>
-            <div class="field flex row col1 ">
+        </div>
+    <div class = "container flex col center-hor">
+        <div  class= "list-item outline1" v-for="(item,idx) in list">
+            <div v-if="item" class="field flex row col1 ">
+            
                 <div class="field-line flex col1">
+                    <div class="field flex col width3">
+                                <div class="item " >{{idx+1}}</div>
+                    </div>
                     <div class="field flex col width10">
                             <div class="field header show1 ">Name:</div>
-                                <b-form-input size="lg" disabled class="input name" v-model="item.name"></b-form-input>
+                                <div class="item " >{{item.name}}</div>
+                                <!--<b-form-input size="lg" disabled class="input name" v-model="item.name"></b-form-input>-->
                     </div>
                     <div class="field flex col width10 ">
-                            <div class="field header show1">שם</div>
-                                <b-form-input size="lg" disabled class="input nameHeb" v-model="item.nameHeb"></b-form-input>
+                            <div class="field header show1">facility:</div>
+                                <div v-for="(facility,idx) in facilities" 
+                                    v-if="facility._id == item.fac" 
+                                    class="item" >{{facility.name}}</div>
                     </div>
                     <div class="field flex col width5">
-                            <div class="field header show1">short</div>
-                                <b-form-input size="lg" disabled class="input " v-model="item.nameShort"></b-form-input>
+                            <div class="field header show1">volume:</div>
+                                <div class="item " >{{item.vol}}</div>
+                                <!--<b-form-input size="lg" disabled class="input " v-model="item.vol"></b-form-input>-->
                     </div>
                     <div class="field flex col width5">
-                            <div class="field header show1">מקוצר</div>
-                                <b-form-input size="lg" disabled class="input " v-model="item.nameHebShort"></b-form-input>
+                            <div class="field header show1">idx:</div>
+                                <div class="item " >{{item.idx}}</div>
+                                <!--<b-form-input size="lg" disabled class="input " v-model="item.idx"></b-form-input>-->
                     </div>
-                    <b-button variant='warning' class="margin-sides1" @click="editRecord(item)">
+                    <b-button size="sm" variant='warning' class="margin-sides1" @click="editRecord(item)">
                         <b-tooltip :delay="tooltipDelay" content="edit page">
                                 <i class="material-icons">mode_edit</i>
                         </b-tooltip>
                     </b-button>
-
                 </div>
             </div>
             </div>
@@ -47,7 +57,7 @@
                 <b-button  size="lg" variant='primary' @click="saveAll(list,listName)">save all</b-button>
             </b-tooltip>
             
-            <b-button variant='primary' @click="getList(listName,{},$event)">
+            <b-button variant='primary'  @click="getList(listName,{},$event)">
                 <b-tooltip :delay="tooltipDelay" content="refresh list">
                         <i class="material-icons">refresh</i>
                 </b-tooltip>
@@ -66,16 +76,22 @@
                                 <b-form-input size="lg" @keydown.native="modalIsDirty" class="input" v-model="item.name"></b-form-input>
                         </div>
                         <div class="field  col ">
-                                <div class="field header ">שם:</div>
-                                <b-form-input size="lg"  @keydown.native="modalIsDirty" class="input" v-model="item.nameHeb"></b-form-input>
+                                <div class="field header ">facility:</div>
+                                <!--<b-form-select v-model="item.fac" key="facilities._id" :options="facilities" class="mb-3"></b-form-select>-->
+                                <select v-model="item.fac" :options="facilities" 
+                                    @change="modalIsDirty" >
+                                    <option v-for="opt in facilities" :value="opt._id">{{opt.name}} </option>
+
+                                </select>
+                                <!--<b-form-input size="lg"  @keydown.native="modalIsDirty" class="input" v-model="item.fac"></b-form-input>-->
                         </div>
                         <div class="field  col ">
-                                <div class="field header ">nameShort:</div>
-                                <b-form-input size="lg" @keydown.native="modalIsDirty" class="input" v-model="item.nameShort"></b-form-input>
+                                <div class="field header ">volume:</div>
+                                <b-form-input size="lg" @keydown.native="modalIsDirty" class="input" v-model="item.vol"></b-form-input>
                         </div>
                         <div class="field  col ">
-                                <div class="field header ">מקוצר:</div>
-                                <b-form-input size="lg" @keydown.native="modalIsDirty" class="input" v-model="item.nameHebShort"></b-form-input>
+                                <div class="field header ">idx:</div>
+                                <b-form-input size="lg" @keydown.native="modalIsDirty" class="input" v-model="item.idx"></b-form-input>
                         </div>
                     <!--===========BUTTONS PANNEL========-->
                     <div  class="buttons-pnl">
@@ -143,11 +159,11 @@ import moment from 'moment'
 
 
 export default {
-  name: 'Facilities',
+  name: 'Ponds',
   data() {
     return {
     //   mixins: [mixins],
-      componentName:'Facilities list',
+      componentName:'Ponds list',
       state:this.$store.getters.fetchGetState,
       ponds:this.$store.getters.fetchGetPonds,
       facilities:this.$store.getters.fetchGetFacilities,//
@@ -155,28 +171,52 @@ export default {
       editMode:false,
       pageEdit:false,
       tooltipDelay:700,
-      fetchList:this.$store.getters.fetchGetFacilities,//need to be changed!!
+      fetchList:this.$store.getters.fetchGetPonds,//need to be changed!!
       list:[],
-      listName:'facilities',//need to be changed!!
+      listName:'ponds',//need to be changed!!
       item: '',
-      itemName: 'facility',
+      itemName: 'pond',
       modalDirty:false,
       modal2:false
     }
   },
   created () {
         this.getList(this.listName,{});
-        this.list = this.$store.getters.fetchGetFacilities;
+        this.list = this.$store.getters.fetchGetPonds;
   },
     watch:{
       list1: function(newList){
-        this.list = this.$store.getters.fetchGetFacilities;
+            var list = this.$store.getters.fetchGetPonds;
+            list = this.sortlistBy2Keys(list,'fac','idx');
+            this.list = list
       },
     },
     computed: {
-        list1() {return this.$store.getters.fetchGetFacilities},
+        list1() {
+            var list = this.$store.getters.fetchGetPonds;
+            list = this.sortlistBy2Keys(list,'fac','idx');
+            return list;
+        },
     },
   methods: {//
+     sortlistBy2Keys(list,key1,key2){
+            var list1 = this.cloneDeep(list);
+            list1.sort(function (a, b) {
+                if (a[key1] < b[key1]){
+                    return -1;
+                }else if (a[key1] > b[key1]){
+                    return 1;
+                }else{
+                    if (a[key2] < b[key2]){
+                        return -1;
+                    }else if (a[key2] > b[key2]){
+                        return 1;
+                    }
+                    return 0;
+                }
+            });
+            return list1
+     },
         cloneDeep(obj){
             var myJSON = JSON.stringify(obj);
             return JSON.parse(myJSON)
@@ -264,5 +304,17 @@ export default {
 }
 </script>
 <style scoped>
-
+select{
+    width:100%;
+}
+.container{
+    width: calc(100% + 25px);
+    height: calc(100% - 200px);
+    overflow-y: scroll;
+    padding-right: 27px;
+    padding:10px;
+    /*height: calc(100vh - 10em);*/
+   /*background-color: yellow;*/
+    /*border:1px solid green;*/
+}
 </style>

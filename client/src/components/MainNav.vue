@@ -7,6 +7,7 @@
     <router-link to="/Graders"><button>Graders</button></router-link>
     <router-link to="/Fishes"><button>fishes</button></router-link>
     <router-link to="/Facilities"><button>Facilities</button></router-link>
+    <router-link to="/Ponds"><button>ponds</button></router-link>
   </div>
 </template>
 
@@ -52,6 +53,9 @@ export default {
   // display: flex;
   // justify-content: flex-end;
   // align-items: flex-start; //z-index: 5;
+}
+.navbar{
+  // position:fixed;
 }
 
 </style>

@@ -1,45 +1,47 @@
 <template>
   <section class= "section">
+      <!--{{mixins.getIdxById1('rrr')}}-->
     <div class = "container flex col center-hor">
+
         <div class= "main-header" >{{componentName}}</div>
-        <div  class= "list-item outline1" v-for="(item,idx) in list">
+        <div  class= "list-item outline1" v-for="(fish,idx) in fishes">
             <div v-if="idx === 0" class= "header self-al-start outline1 field flex row field-line" >
                 <div class="field header name hide1">Name:</div>
-                <div class="field width10 hide1">שם</div>
-                <div class="field width5 hide1">short</div>
-                <div class="field width5 hide1">מקוצר</div>
+                <div class="field nameHeb hide1">Heb</div>
+                <div class="field nameShort hide1">Short</div>
             </div>
             <div class="field flex row col1 ">
-                <div class="field-line flex col1">
-                    <div class="field flex col width10">
-                            <div class="field header show1 ">Name:</div>
-                                <b-form-input size="lg" disabled class="input name" v-model="item.name"></b-form-input>
-                    </div>
-                    <div class="field flex col width10 ">
-                            <div class="field header show1">mm</div>
-                                <b-form-input size="lg" disabled class="input nameHeb" v-model="item.mm"></b-form-input>
-                    </div>
-                    <b-button variant='warning' class="margin-sides1" @click="editRecord(item)">
+                <div class="field-line flex col1 eeeee ">
+                    <div class="field flex col ">
+                            <div class="field header show1">Name:</div>
+                            <b-form-input size="lg" disabled class="input name" v-model="fish.name"></b-form-input></div>
+                    <div class="field flex col ">
+                            <div class="field header show1">שם עברי:</div>
+                            <b-form-input size="lg" disabled class="input nameHeb" v-model="fish.nameHeb"></b-form-input></div>
+                    <div class="field flex col ">
+                            <div class="field header show1">short:</div>
+                            <b-form-input size="lg" disabled class="input nameShort" v-model="fish.nameShort"></b-form-input></div>
+                    <b-button variant='warning' class="margin-sides1" @click="editRecord(fish)">
                         <b-tooltip :delay="tooltipDelay" content="edit page">
                                 <i class="material-icons">mode_edit</i>
                         </b-tooltip>
                     </b-button>
-
+                    
                 </div>
             </div>
             </div>
     </div>
     <div  class="buttons-pnl margin-top-1 flex row center-ver">
-                <b-button variant='primary' @click="addNewLocalRecord(listName)">
+                <b-button variant='primary' @click="addNewLocalRecord('fishes')">
                     <b-tooltip :delay="tooltipDelay" content="add new record">
                         <i class="material-icons">add_box</i>
                     </b-tooltip>
                 </b-button>
             <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="save all">
-                <b-button  size="lg" variant='primary' @click="saveAll(list,listName)">save all</b-button>
+                <b-button  size="lg" variant='primary' @click="saveAll(fishes,'fishes')">save all</b-button>
             </b-tooltip>
             
-            <b-button variant='primary' @click="getList(listName,{},$event)">
+            <b-button variant='primary' @click="getList('fishes',{},$event)">
                 <b-tooltip :delay="tooltipDelay" content="refresh list">
                         <i class="material-icons">refresh</i>
                 </b-tooltip>
@@ -49,28 +51,28 @@
       <transition name="fade">
             <div  v-on:click="closeModal"  v-if="pageEdit" class="modal" >
                 <div v-on:click.stop="pageEdit=true" class="inner-modal flex col center-hor ">
-                    <a href="javascript:void(0)" class="closebtn" @click.stop="closeModal">&times;</a>
-                    <div  class= "main-header" >Edit {{itemName}}</div>
+                   <!--=========================-->
                     <div   class="field-line flex col form">
                         <div class="field  col ">
                                 <div class="field header">Name:</div>
-                                <b-form-input size="lg" @keydown.native="modalIsDirty" class="input" v-model="item.name"></b-form-input>
-                        </div>
+                                <b-form-input size="lg" class="input" v-model="fish.name"></b-form-input></div>
                         <div class="field  col ">
-                                <div class="field header ">mm:</div>
-                                <b-form-input size="lg"  @keydown.native="modalIsDirty" class="input" v-model="item.mm"></b-form-input>
-                        </div>
+                                <div class="field header ">שם עברי:</div>
+                                <b-form-input size="lg" class="input" v-model="fish.nameHeb"></b-form-input></div>
+                        <div class="field  col ">
+                                <div class="field header">short:</div>
+                                <b-form-input size="lg" class="input" v-model="fish.nameShort"></b-form-input></div>
                     <!--===========BUTTONS PANNEL========-->
                     <div  class="buttons-pnl">
-                        <b-button :class="{ btnDisabled: !modalDirty }" :disabled= "!modalDirty" variant='primary'  
-                            @click.stop="saveRecord(listName,item,$event)">
-                            <b-tooltip  class="margin-sides1" :delay="tooltipDelay" content="backup">
+                        <b-button variant='primary'  
+                            @click.stop="saveRecord('fishes',fish,$event)">
+                            <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="backup">
                                     <i  class="material-icons">backup</i>
                             </b-tooltip>
                         </b-button>
                         
                         <b-button variant='danger'  
-                                    @click.stop="deleteFromList(listName,item._id,$event)">
+                                    @click.stop="deleteFromList('fishes',fish._id,$event)">
                                 <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="delete">
                                     <i class="material-icons">delete_forever</i>
                                 </b-tooltip>
@@ -82,41 +84,13 @@
                             </b-tooltip>
                         </b-button>
                 </div>
+                    <!--===================-->
                 </div>
             </div>
                 <div class="modal-background "></div>
         </div>
         </transition>
-
-                      <!--====================MODAL2========================-->
-      <transition name="fade">
-            <div  v-on:click="modal2='false'"  v-if="modal2" class="modal" >
-                <div v-on:click.stop="modal2=true" class="inner-modal flex col center-hor ">
-                   <!--============HEADER=============-->
-                    <a href="javascript:void(0)" class="closebtn" @click.stop="closeModal2">&times;</a>
-                    <div class= "main-header" >are you sure you want to delete?</div>
-                    <div   class="field-line flex col form">
-
-                    <!--===========BUTTONS PANNEL========-->
-                    <div  class="buttons-pnl">
-                        <b-button variant='danger'  
-                                    @click.stop="deleteFromList2(listName,item._id,$event)">
-                                <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="delete">
-                                    <i class="material-icons">delete_forever</i>
-                                </b-tooltip>
-                        </b-button>
-                        <b-button variant='warning' @click.stop="closeModal2">
-                            <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="undo">
-                                <i class="material-icons">undo</i>
-                            </b-tooltip>
-                        </b-button>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-background "></div>
-        </div>
-        </transition>
-
+           <!--================================================-->
   </section>
 </template>
 <script>
@@ -126,54 +100,43 @@ import moment from 'moment'
 
 
 export default {
-  name: 'Graders',
+  name: 'FishesList',
   data() {
     return {
     //   mixins: [mixins],
-      componentName:'Graders list',
+      arr:[{id:1,name:'ilan'},{id:2,name:'noam'}],
+      componentName:'Fishes List',
       state:this.$store.getters.fetchGetState,
       ponds:this.$store.getters.fetchGetPonds,
-      facilities:this.$store.getters.fetchGetFacilities,//
+      facilities:this.$store.getters.fetchGetFacilities,//fetchGetCurrFish
+      fishes:this.$store.getters.fetchGetFishes,
+      currFish:{},
       pageMode:'readOnly',
       editMode:false,
       pageEdit:false,
       tooltipDelay:700,
-      fetchList:this.$store.getters.fetchGetGraders,//need to be changed!!
-      list:[],
-      listName:'graders',//need to be changed!!
-      item: '',
-      itemName: 'grader',
-      modalDirty:false,
-      modal2:false
+      fish: ''
     }
   },
   created () {
-        this.getList(this.listName,{});
-        this.list = this.$store.getters.fetchGetGraders;
+        this.getList('fishes',{})
   },
     watch:{
-      list1: function(newList){
-        this.list = this.$store.getters.fetchGetGraders;
+      fishes1: function(newFishes){
+        this.fishes = this.$store.getters.fetchGetFishes;
       },
     },
     computed: {
-        list1() {return this.$store.getters.fetchGetGraders},
+        fishes1() {return this.$store.getters.fetchGetFishes;},
     },
   methods: {//
-        cloneDeep(obj){
-            var myJSON = JSON.stringify(obj);
-            return JSON.parse(myJSON)
-        },
-    modalIsDirty(){
-        this.modalDirty = true;
-    },
+    //   getObjById1:mixins.getObjById1,
   closeModal(){
             this.pageEdit =false;
-            this.modalDirty = false;
   },
-      editRecord(item){
+      editRecord(fish){
             this.pageEdit =!this.pageEdit;
-            this.item = this.cloneDeep(item);
+            this.fish = fish;
       },
         toggleField(e,bul){
             var parent = e.path[5];
@@ -202,12 +165,11 @@ export default {
                 this. closeModal()
       },
       addNewLocalRecord(arr){
-        this.item = {mode :'edit'};
+        this.fish = {mode :'edit'};
         this.pageEdit =true;
       },
-      getList(listName,criteria){
-            console.log('graders.getList', listName)
-            const acts =[{ actType: 'getList', list:listName, criteria:{} }];
+      getList(list,criteria){
+            const acts =[{ actType: 'getList', list:list, criteria:{} }];
             this.sendMsg({acts});
       },
     getObjById(objId,arr) {
@@ -217,20 +179,13 @@ export default {
         })
         return obj
     },
-      deleteFromList2(list,id,e){
+      deleteFromList(list,id,e){
             const acts =[
                             { actType: 'deleteFromList', objId:id, list},
                             { actType: 'getList', list:list, criteria:{} }
                         ]
             this.sendMsg({acts});
             this.closeModal();
-            this.modal2 =false;
-      },
-      closeModal2(){
-        this.modal2 =false;
-      },
-      deleteFromList(list,id,e){
-        this.modal2 =true;
       },
       toggleDisable(inputNodes,bul){
             for (var i = 0; i < inputNodes.length; i++) {
@@ -248,4 +203,7 @@ export default {
 </script>
 <style scoped>
 
+*{
+    /*border:1px solid green;*/
+}
 </style>

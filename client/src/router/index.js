@@ -10,6 +10,7 @@ import Grading from '@/components/exams/Grading'
 import Facilities from '@/components/exams/Facilities'
 import Graders from '@/components/exams/Graders'
 import Fishes from '@/components/exams/Fishes'
+import Ponds from '@/components/exams/Ponds'
 // import Grading from '@/components/exams/Grading'
 // import Grading from '@/components/exams/Grading'
 // import Grading from '@/components/exams/Grading'
@@ -54,6 +55,10 @@ export default new Router({
       path: '/fishes',
       name: 'Fishes',
       component: Fishes
+    },{
+      path: '/ponds',
+      name: 'Ponds',
+      component: Ponds
     },
 
   ]
