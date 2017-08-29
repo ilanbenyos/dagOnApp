@@ -1,14 +1,15 @@
 <template>
   <section class= "section">
-    <div class = "container flex col center-hor">
-        <div class= "main-header" >{{componentName}}</div>
-        <div  class= "list-item outline1" v-for="(item,idx) in list">
-            <div v-if="idx === 0" class= "header self-al-start outline1 field flex row field-line" >
+    <div class= "main-header" >{{componentName}}</div>
+            <div  class= "header self-al-start outline1 field flex row field-line" >
                 <div class="field header name hide1">Name:</div>
                 <div class="field width10 hide1">שם</div>
                 <div class="field width5 hide1">short</div>
                 <div class="field width5 hide1">מקוצר</div>
             </div>
+    </div>
+    <div class = "container flex col center-hor">
+        <div  class= "list-item outline1" v-for="(item,idx) in list">
             <div class="field flex row col1 ">
                 <div class="field-line flex col1">
                     <div class="field flex col width10">
@@ -247,5 +248,7 @@ export default {
 }
 </script>
 <style scoped>
-
+.container{
+outline:1px solid green;
+}
 </style>

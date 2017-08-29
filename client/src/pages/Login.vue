@@ -62,7 +62,7 @@ export default {
     this.users = this.$store.getters.fetchGetUsers;
 
     var currUserInit1 = this.$store.getters.fetchGetUser;
-    var currUserInit = this.cloneDeep(currUserInit1)
+    var currUserInit = this.clone1Deep(currUserInit1)
     console.log('Edit - created - currUserInit:', currUserInit)
     if (currUserInit) this.tempUser = currUserInit;
   },
@@ -101,7 +101,7 @@ export default {
           const params = { event:e,askFrom:'store'}
           this.sendMsg({ act,params})
       },
-    cloneDeep(obj){
+    clone1Deep(obj){
       var myJSON = JSON.stringify(obj);
       return JSON.parse(myJSON)
     },

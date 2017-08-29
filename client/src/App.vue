@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="container">
+  <div id="app">
     =={{msg}}==
     <MainNav class="navbar" />
     <router-view></router-view>
@@ -14,7 +14,7 @@ export default {
   data() {
     return {
       msg:'App.vue',
-      listsToUpload:['graders','fishes','facilities']
+      listsToUpload:['graders','fishes','facilities','pnds']
     }
   },
     created() {
@@ -41,9 +41,6 @@ export default {
 
 <style lang="scss">
 
-// .container{
-//   background-color: blue;
-// }
 
 @import url('https://fonts.googleapis.com/css?family=Kurale');
 #app {
@@ -76,21 +73,20 @@ body {
     text-decoration: none!important;
   }
 }
-//=====================================================
 .section{
-    height: 100%;
+    height: 93%;
     width: 100%;
-    overflow: hidden;
+    // overflow: hidden;
 }
 .container{
+    border-bottom:1px solid gray;
+    overflow: hidden;
     width: calc(100% + 25px);
-    height: calc(100% - 170px);
+    height: calc(100% - 200px);
     overflow-y: scroll;
     padding-right: 27px;
     padding:10px;
-    /*height: calc(100vh - 10em);*/
-   /*background-color: yellow;*/
-    /*border:1px solid green;*/
+
 }
 .modal{
     position:fixed;

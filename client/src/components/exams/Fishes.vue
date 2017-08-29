@@ -173,7 +173,7 @@ export default {
         list1() {return this.$store.getters.fetchGetFishes},
     },
   methods: {//
-        cloneDeep(obj){
+        clone1Deep(obj){
             var myJSON = JSON.stringify(obj);
             return JSON.parse(myJSON)
         },
@@ -186,7 +186,7 @@ export default {
   },
       editRecord(item){
             this.pageEdit =!this.pageEdit;
-            this.item = this.cloneDeep(item);
+            this.item = this.clone1Deep(item);
       },
         toggleField(e,bul){
             var parent = e.path[5];

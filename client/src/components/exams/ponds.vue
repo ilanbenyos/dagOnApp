@@ -153,11 +153,8 @@
   </section>
 </template>
 <script>
-
 import { SENDMSG } from '../../store/store'
 import moment from 'moment'
-
-
 export default {
   name: 'Ponds',
   data() {
@@ -180,10 +177,12 @@ export default {
       modal2:false
     }
   },
-  created () {
+  mounted () {
         this.getList(this.listName,{});
-        this.list = this.$store.getters.fetchGetPonds;
-  },
+        var list = this.$store.getters.fetchGetPonds;
+            list = this.sortlistBy2Keys(list,'fac','idx');
+            this.list = list  
+        },
     watch:{
       list1: function(newList){
             var list = this.$store.getters.fetchGetPonds;
@@ -200,6 +199,7 @@ export default {
     },
   methods: {//
      sortlistBy2Keys(list,key1,key2){
+            console.log('sortlistBy2Keys',list.length);
             var list1 = this.cloneDeep(list);
             list1.sort(function (a, b) {
                 if (a[key1] < b[key1]){
