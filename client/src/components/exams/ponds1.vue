@@ -1,29 +1,53 @@
 <template>
   <section class= "section">
         <div class= "main-header" >{{componentName}}</div>
+            <div  class= "display-none-1 header self-al-start outline1 field flex row field-line" >
+                <div class="field width3 hide1">idx</div>
+                <div class="field width10 name hide1">Name:</div>
+                <div class="field width10 hide1">facility</div>
+                <div class="field width5 hide1">volume</div>
+                <div class="field width5 hide1">idx</div>
+            </div>
+        </div>
     <div class = "container flex col center-hor">
-        <b-card-group deck>
-            <div  class= "list-item outline1" v-for="(item,idx) in list">
-                <div class="card flex row col1">
-                    <div class="flex row space-around margin-top-sm">
-                        <div class="item width5 font-size-md" > {{item.name}} </div>
-                        <div  class="item width5" v-for="(facility,idx) in facilities" 
-                                v-if="facility._id == item.fac">{{facility.name}}
-                        </div>
+        <div  class= "list-item outline1" v-for="(item,idx) in list">
+            <div v-if="item" class="field flex row col1" >
+            <!--<div v-if="item" class="field flex row col1" v-bind:class="isDeletedItem(item)">-->
+                <div class="field-line flex align-center-1">
+                    <div class=" flex width3 display-none-1">
+                                <div class="item float-left1 " >{{idx+1}}</div>
                     </div>
-                    <div class="flex row space-around margin-top-sm">
-                        <div class="item width7 " >volume: {{item.vol}} </div>
-                        <div class="item width5 " >idx: {{item.idx}} </div>
+                    <div class=" flex  width10 width-100-1">
+                            <!--<div class="field header display-none-1 ">Name:</div>-->
+                                <div class="item width10 width-100-1 size-md-1" >{{item.name}}</div>
                     </div>
-                    <b-button size="sm" variant='warning' class="margin-sides1 margin-top-sm" @click="editRecord(item)">
+                </div>
+                <div class="field-line flex space-around1">
+                    <div class=" flex  width10 ">
+                            <div class="field header show1 text-align-right-1">facility:</div>
+                                <div v-for="(facility,idx) in facilities" 
+                                    v-if="facility._id == item.fac" 
+                                    class="item width10" >{{facility.name}}</div>
+                    </div>
+                    <div class="field flex width5">
+                            <div class="field header show1 text-align-right-1">volume:</div>
+                                <div class="item " >{{item.vol}}</div>
+                                <!--<b-form-input size="lg" disabled class="input " v-model="item.vol"></b-form-input>-->
+                    </div>
+                    <div class="field flex width5">
+                            <div class="field header show1 text-align-right-1">idx:</div>
+                                <div class="item " >{{item.idx}}</div>
+                                <!--<b-form-input size="lg" disabled class="input " v-model="item.idx"></b-form-input>-->
+                    </div>
+                </div>
+                    <b-button size="sm" variant='warning' class="margin-sides1" @click="editRecord(item)">
                         <b-tooltip :delay="tooltipDelay" content="edit page">
                                 <i class="material-icons">mode_edit</i>
                         </b-tooltip>
                     </b-button>
-                </div>
+                <!--</div>-->
             </div>
-        </b-card-group >
-    </div>
+            </div>
     </div>
     <div  class="buttons-pnl margin-top-1 flex row center-ver">
                 <b-button variant='primary' @click="addNewLocalRecord(listName)">

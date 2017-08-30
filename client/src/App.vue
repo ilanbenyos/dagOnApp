@@ -49,7 +49,7 @@ export default {
   font-family: 'Kurale', Helvetica, Arial, sans-serif;
   text-align: center;
   color: #652456;
-  background: rgba(230, 230, 230, 0.7);
+  background: white;
   // max-width: 768px;
   height: 100%;
   ;
@@ -80,7 +80,10 @@ body {
 }
 .container{
     border-bottom:1px solid gray;
-    overflow: hidden;
+    overflow-y: hidden;
+    /*height: calc(100vh - 10em);*/
+   /*background-color: yellow;*/
+    /*border:1px solid green;*/
     width: calc(100% + 25px);
     height: calc(100% - 200px);
     overflow-y: scroll;
@@ -128,12 +131,14 @@ body {
   flex-direction: column;
 }
 .field{
-    margin:.3em;
+    // margin:.3em;
     font-size:1em;
 }
 .field-line{
     /*flex-wrap: wrap;*/
     max-width:100%;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 .form{
     /*padding:1em;*/
@@ -141,6 +146,10 @@ body {
 .list-item{
     width:100%;
     margin-bottom:1em;
+            padding:1em;
+        padding-right:1.5em;
+        padding-left:1.5em;
+
 }
 .button{
     height:80%;
@@ -155,6 +164,9 @@ input{
 }
 .width5{
     width: 5em;
+}
+.width7{
+    width: 7em;
 }
 .width3{
     width: 3em;
@@ -196,7 +208,10 @@ select{
 }
 .header{
     color:black;
+    font-size:1.3em;
     font-weight: bold;
+    padding-right:0.5em;
+    padding-left:0.5em;
 }
 .input {
     font-size:1em;
@@ -229,28 +244,65 @@ select{
   .item{
       font-size: 1.5em;
     }
-
+.card{
+    width:80vw;
+}
+.margin-top-sm{
+    margin-top:0.5em;
+}
+.font-size-md{
+    font-size:2em;
+}
 @media screen and (max-width: 650px) {
     .container{
-        width:calc(100% + 17px);
+        // width:calc(100% + 17px);
+        width:100%;
+    }
+    .align-center-1{
+        align-items: center;
     }
     .field{
         /*background-color: lightgoldenrodyellow;*/
-        width:98%;
+        // width:98%;
+    }
+    .field-line{
+        display: inline;
     }
     .input{
         width:98%;
     }
+    .width-100-1{
+        width:100%;
+    }
     .show1{
             display:block;
         }
+    .text-align-right-1{
+        text-align: right;
+    }
     .hide1{
             display:none;
     }
-        .col1{
+    .list-item{
+        padding:1em;
+        padding-right:1.5em;
+        padding-left:1.5em;
+    }
+    .size-md-1{
+        font-size: 2em;
+    }
+    .col1{
             flex-direction: column;
-        }
-    
+    }
+    .space-around1{
+        justify-content: space-around;
+    }
+    .float-left1{
+     float : left;  
+    }
+    .display-none-1{
+        display:none;
+    }
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .7s
