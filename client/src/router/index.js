@@ -6,6 +6,14 @@ import Router from 'vue-router'
 import Splash from '@/pages/Splash'
 import Login from '@/pages/Login'
 import Oxygen from '@/components/exams/Oxygen'
+import Grading from '@/components/exams/Grading'
+import Facilities from '@/components/exams/Facilities'
+import Graders from '@/components/exams/Graders'
+import Fishes from '@/components/exams/Fishes'
+import Ponds from '@/components/exams/Ponds'
+// import Grading from '@/components/exams/Grading'
+// import Grading from '@/components/exams/Grading'
+// import Grading from '@/components/exams/Grading'
 
 import Browse from '@/pages/Browse'
 
@@ -31,6 +39,27 @@ export default new Router({
       path: '/oxygen',
       name: 'Oxygen',
       component: Oxygen
+    },{
+      path: '/grading',
+      name: 'Grading',
+      component: Grading
+    },{
+      path: '/graders',
+      name: 'Graders',
+      component: Graders
+    },{
+      path: '/facilities',
+      name: 'Facilities',
+      component: Facilities
+    },{
+      path: '/fishes',
+      name: 'Fishes',
+      component: Fishes
+    },{
+      path: '/ponds',
+      name: 'Ponds',
+      component: Ponds
     },
+
   ]
 })

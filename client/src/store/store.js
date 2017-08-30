@@ -1,7 +1,8 @@
 
-export const SND_MSG = 'SND_MSG';//
+export const SND_MSG = 'SND_MSG';
 export const LOG_IN = 'LOG_IN';
-export const SENDMSG = 'SENDMSG';
+export const SENDMSG = 'SENDMSG';//
+export const SENDLOCALMSG = 'SENDLOCALMSG';//
 
 import service from '../services/service'
 
@@ -10,27 +11,21 @@ const state = {
   loginStatus: true,
   // user: {id:111,password:111,txt:'111'},
   user: {},
-  users:[{id:1,userName: '111', txt:'txt111'},{id:2,userName:'222',txt:'txt222'}],
+  users:[],
   storeMsg:'first msg from store',
-  dog:{}
+  dog:{},
+  acts:[],
+  ponds:[],
+  facilities:[],
+  fishes:[],
+  batches:[],
+  graders:[],
+  fish:''
 };
 
 const getters = {
-  fetchUsersMatched(state) {
-    console.log('store.getters.USERS_MATCHED', state.usersMatched)
-    return state.usersMatched;
-  },
   fetchGetMsg(state) {
-    console.log('store.getters.fetchGetMsg', state.storeMsg)
     return state.storeMsg;
-  },
-  fetchGetDog(state) {
-    console.log('store.getters.fetchGetMsg', state.dog)
-    return state.dog;
-  },
-  fetchGetList(state) {
-    console.log('store.getters.fetchGetList', state.users)
-    return state.users;
   },
   fetchGetUser(state) {
     return state.user;
@@ -38,31 +33,73 @@ const getters = {
   fetchGetUsers(state) {
     return state.users;
   },
+  fetchGetActs(state) {
+    return state.acts;
+  },
+  fetchGetPonds(state) {
+    return state.ponds;
+  },
+  fetchGetGraders(state) {
+    return state.graders;
+  },
+  fetchGetFacilities(state) {
+    return state.facilities;
+  },
+  fetchGetBatchs(state) {
+    return state.batchs;
+  },
+  fetchGetFishes(state) {
+    return state.fishes;
+  },
+  fetchGetCurrFish(state) {
+    return state.currFish;
+  },
+  fetchGetState(state) {
+    return state;
+  }
 
+}
+function getObjById(objId,arr) {
+      var arr1 = this[arr];
+      var obj = arr.find(function (obj1) {
+          return (objId === obj1._id)
+      })
+      return obj
+}
+function getIdxById(objId,arr) {
+      index = state[arr].findIndex(item => item._id==objId);
+      return index
 }
 
 const mutations = {
 
   [SENDMSG](state, payload) {
-    var actType = payload.msg.act.actType;
-    switch (actType) {
-			case 'addUser'://    
-				console.log('store.SENDMSG.addUser');
-        var obj1 = payload.res;
-        state.user = obj1;
-			break;
-			case 'getList'://    
-				console.log('store.SENDMSG.agetList');
-        var objs = payload.res;
-        state.users = objs;
-			break;
-			case 'updateUser'://    
-				console.log('store.SENDMSG.updateUser');
-        var user = payload.msg.act.data;
-        state.user = user;
-			break;
+    var acts = payload.res
+    for (var i = 0; i < acts.length; i++) {
+      var act = acts[i];
+      var actType = act.actType;
+      switch (actType) {
+        case 'setUser'://    
+          state.user = act.res;
+        break;
+        case 'addToList'://    
+          var list = act.list
+          // state[list] = act.res;
+          state[list].splice(0,state[list].length, act.res);
+        
+        break;
+        case 'getList'://    
+          var list = act.list
+          state[list] = act.res;
+        break;
+        case 'updateInList':// 
+          //  var idx= getIdxById(act.id,act.list);
+          var list = act.list
+          var idx = state[list].findIndex(item => item._id==act.id);
+          state[list][idx] = act.res;
+        break;
+      }
     }
-
 
   },
   [LOG_IN](state, { user }) {
@@ -87,26 +124,16 @@ const mutations = {
 }
 
 const actions = {//
-
-  [LOG_IN](context, payload) {
-    console.log('store.LOG_IN:', payload)
-    var prm = service.logIn(payload);
-    prm.then(res => {
-      payload.user = res;
-      context.commit(payload);
-    })
-  },
   [SENDMSG](context, payload) {
-    if(payload.msg.params.askFrom === 'server'){
         var prm = service.sendMsg(payload);
         return prm.then(res => {
           payload.res = res;
           context.commit(payload);
       });
-    }else{//go directly to mutations
+  },
+  [SENDLOCALMSG](context, payload) {
+    //go directly to mutations
           context.commit(payload);
-    }
-    
   },
 
 

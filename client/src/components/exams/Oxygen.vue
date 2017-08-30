@@ -4,6 +4,7 @@
       <tr>
         <th>Ponds</th>
         <th
+
         v-if="!isActTimeChanging(act,idx)"
         v-for="(act,idx) in currFacility.ponds[0].acts" :key="act.id"
         @dblclick="toggleChangeTime(act,idx)">{{act.time}}</th>
@@ -13,6 +14,7 @@
       <tr v-for="(pond,idx) in currFacility.ponds" :key="pond.id">
         <td @click="addPondAct(pond.acts)">{{pond.id}}</td>
         <td 
+
           v-if="act.type === TYPE_OXYGEN"
           
           @dblclick="editModeVal(act)"
@@ -24,6 +26,7 @@
           <div v-else> {{act.val}}</div>
 
         </td>
+
         <td 
           v-if="isInputMode" 
           ><input 

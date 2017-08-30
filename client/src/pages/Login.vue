@@ -6,10 +6,18 @@
       <button class="button" @click="getMsgFromStore">getMsgFromStore</button>
       <button class="button" @click="getMsgFromServer($event)">getMsgFromServer</button>
         <div>
-            <button class="button" @click="getUsers">getUsers</button>
+            <button class="button" @click="getList($event,'users')">get users</button>
                 last user:<div class="users" >users.length:{{users.length}}</div>
+            <button class="button" @click="getList($event,'facilities')">get facilities</button>
+                facilities:<div class="users" >facilities.length:{{facilities.length}}</div>
+            <button class="button" @click="getList($event,'ponds')">get ponds</button>
+            <button class="button" @click="getList($event,'ponds',{fac:{$gt:'1'}})">get ponds from fac 1</button>
+                ponds:<div class="users" >ponds.length:{{ponds.length}}</div>
           <div>
-              <div  v-for="(user1,idx) in users" ><div v-if= "idx<7" >{{idx}}:{{user1.userName}}/{{user1.password}}</div></div>
+              <div  v-for="(user1,idx) in users" v-if= "idx<7"><div  >{{idx}}:{{user1.userName}}/{{user1.password}}</div>
+                  <button class="button" @click="setUser($event,user1)">set user</button>
+              </div>
+              <div  v-for="(pond,idx) in ponds" ><div v-if= "idx<7" >id:{{pond.id}}/name{{pond.name}}</div></div>
           </div>
         </div>
 
@@ -21,13 +29,10 @@
             <div>
               <button class="button" @click="submit">submit</button>
               <button class="button" @click="updateUser">updateUser</button>
-              <button class="button" @click="deleteUser">deleteUser</button>
+              <button class="button" @click="deleteFromList($event,'users',user._id)">deleteUser</button>
             </div>
         </div>
         <div>
-            dog name:<input v-model="dog.name" class="input" placeholder="dog name" ></input>
-            dog type:<input v-model="dog.type" class="input" placeholder="dog type" ></input>
-            <button class="button" @click="insertDog">insertDog</button>
         </div>
     </div>
   </transition>
@@ -44,7 +49,8 @@ export default {
       msg:'login',
       users:[],
       user: {},
-      dog:{_id:null,name:'',type:''},
+      facilities:[],
+      ponds:[],
       tempUser:{
                 login: '',
                 password: '',
@@ -52,18 +58,17 @@ export default {
                 }
       }
   },
-    created() {//fetchGetDog
+    created() {
     this.users = this.$store.getters.fetchGetUsers;
-    this.dog = this.$store.getters.fetchGetDog;
 
     var currUserInit1 = this.$store.getters.fetchGetUser;
-    var currUserInit = this.cloneDeep(currUserInit1)
+    var currUserInit = this.clone1Deep(currUserInit1)
     console.log('Edit - created - currUserInit:', currUserInit)
     if (currUserInit) this.tempUser = currUserInit;
   },
 
   mounted(){
-      this.msg = this.$store.getters.fetchGetMsg;//fetchGetList
+      this.msg = this.$store.getters.fetchGetMsg;
   },
   watch:{
       msg1: function(newMsg){
@@ -75,8 +80,11 @@ export default {
       users1: function(newUsers){
         this.users = this.$store.getters.fetchGetUsers;
       },
-      dog1: function(newDog){
-        this.dog = this.$store.getters.fetchGetDog;
+      facilities1: function(newFacilities){
+        this.facilities = this.$store.getters.fetchGetFacilities;
+      },
+      ponds1: function(newPonds){
+        this.ponds = this.$store.getters.fetchGetPonds;
       },
 
   },
@@ -84,12 +92,16 @@ export default {
     msg1() {return this.$store.getters.fetchGetMsg;},
     user1() {return this.$store.getters.fetchGetUser;},
     users1() {return this.$store.getters.fetchGetUsers;},
+    ponds1() {return this.$store.getters.fetchGetPonds;},
+    facilities1() {return this.$store.getters.fetchGetFacilities;},
 },
   methods: {//
-      getUser(){
-        this.user = this.$store.getters.fetchGetUser;
+      setUser(e,user){
+          const act = { actType: 'setUser', user};
+          const params = { event:e,askFrom:'store'}
+          this.sendMsg({ act,params})
       },
-    cloneDeep(obj){
+    clone1Deep(obj){
       var myJSON = JSON.stringify(obj);
       return JSON.parse(myJSON)
     },
@@ -101,8 +113,8 @@ export default {
           this.msg = this.$store.getters.fetchGetMsg;
           console.log('getMsgFromStore')
       },
-      deleteUser(e){
-          const act = { actType: 'deleteUser', user:this.user._id};
+      deleteFromList(e,list,id){
+          const act = { actType: 'deleteFromList', user:id,list};
           const params = { event:e,askFrom:'server'}
           this.sendMsg({ act,params})
       },
@@ -111,25 +123,26 @@ export default {
           const params = { event:e,askFrom:'server'}
           this.sendMsg({ act,params})
       },
-      getUsers(e){
-          const act = { actType: 'getList', list:'users'};
+      // getUsers(e){
+      //     const act = { actType: 'getList', list:'users'};
+      //     const params = { event:e,askFrom:'server'}
+      //     this.sendMsg({ act,params})
+      // },//
+      getList(e,listName,criteria){
+          const act = { actType: 'getList', list:listName,criteria};
           const params = { event:e,askFrom:'server'}
           this.sendMsg({ act,params})
       },//
-      insertDog(e){
-        const act = { actType: 'insertDog', data: this.dog , collection: 'dogs'}
-        const params = { event:e,askFrom:'server'}
-          this.sendMsg({ act,params})
-      },
+
       submit(e){
-        const act = { actType: 'addUser', data: this.tempUser, collection: 'users' }
+        const act = { actType: 'addToList', data: this.tempUser, collection: 'users' }
         const params = { event:e,askFrom:'server'}
           this.sendMsg({ act,params})
          this.tempUser = {login: '',password: '',txt:''}
       },
       updateUser(e){
         this.tempUser._id = this.user._id;
-        const act = { actType: 'updateUser', data: this.tempUser }
+        const act = { actType: 'updateInList', data: this.tempUser }
         const params = { event:e,askFrom:'server'}
           this.sendMsg({ act,params})
          this.tempUser = {login: '',password: '',txt:''}
