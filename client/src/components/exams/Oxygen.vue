@@ -4,17 +4,29 @@
       <tr>
         <th>Ponds</th>
         <th
-        v-if="!isActTimeChanging(act)"
-        v-for="act in currFacility.ponds[0].acts" :key="act.id"
-        @dblclick="toggleChangeTime(act)">{{act.time}}</th>
-        <th v-else><input type="text" v-model="tempTime" ></input></th>
+
+        v-if="!isActTimeChanging(act,idx)"
+        v-for="(act,idx) in currFacility.ponds[0].acts" :key="act.id"
+        @dblclick="toggleChangeTime(act,idx)">{{act.time}}</th>
+        <th v-else><input type="text" v-model="tempTime" @change="examService.changeActsTimeTo(changeParamFor,tempTime,currFacility)" ></input></th>
         <th><pre>  {{actTime}}    </pre></th>
       </tr>
       <tr v-for="(pond,idx) in currFacility.ponds" :key="pond.id">
         <td @click="addPondAct(pond.acts)">{{pond.id}}</td>
         <td 
-        v-if="act.type === TYPE_OXYGEN"
-        v-for="act in pond.acts" :key="act.id">{{act.val}}</td>
+
+          v-if="act.type === TYPE_OXYGEN"
+          
+          @dblclick="editModeVal(act)"
+          v-for="act in pond.acts" :key="act.id"><div 
+            v-if="changeParamFor.act === act"
+            >
+           <input type="number" v-model="act.val"></input>
+          </div>
+          <div v-else> {{act.val}}</div>
+
+        </td>
+
         <td 
           v-if="isInputMode" 
           ><input 
@@ -25,10 +37,14 @@
         <td v-else @click="addNewExam"> </td>
       </tr>
     </table>
-    <button @click="finishCurrExams">Add Entry</button>
     <button 
-    v-if="timeChangeAct"
-    @click="changeTime">Change time</button>
+    v-if="examService.isEmptyObject(changeParamFor)"
+    @click="finishCurrExams">Add Entry</button>
+    <button 
+      v-else
+      @click="changeTime"
+      >
+      Change Value</button>
     <!-- <div v-if="isInputMode">input mode!
       <table>
         <tr>
@@ -65,9 +81,11 @@ export default {
       isInputMode:false,
       actTime:null,
       tempActs:[],
-      timeChangeAct:false,
-      changeTimeFor:{},
-      tempTime:null
+      examService:examService,
+      changeParamFor:{},
+      // changeExamFor:null,
+      tempTime:null,
+      // tempExamVal:null
     }
   },
   methods: {
@@ -78,7 +96,9 @@ export default {
       console.log('finishing curr exams entries');
       this.tempActs.forEach( tmpAct =>{
         var pond = this.currFacility.ponds.find( pond => pond.id === tmpAct.pond);
-        pond.acts.push(tmpAct);
+        pond.acts.push(JSON.parse(JSON.stringify(tmpAct)));
+        console.log("pushed this act:",tmpAct);
+        pond.acts[pond.acts.length -1].date = new Date(Date.parse(pond.acts[pond.acts.length -1].date));
         console.log('pond acts after push',pond.acts)
       });
     },
@@ -93,25 +113,37 @@ export default {
     resaultAdded(value){
       console.log("saving the temporary resault:", value);
     },
-    toggleChangeTime(act){
-      this.changeTimeFor ={
+    toggleChangeTime(act,idx){
+      this.changeParamFor ={
         day:act.date.getDate(), 
         month:act.date.getMonth(), 
         year:act.date.getFullYear(), 
-        time:act.time
+        time:act.time,
+        index:idx
       };
       this.tempTime = act.time;
-      console.log('toggling change time input ',this.changeTimeFor);
+      console.log('toggling change time input ',this.changeParamFor);
+
+
       this.timeChangeAct = true;
     },
     changeTime(){
-      examService.changeActsTimeTo(this.changeTimeFor,this.tempTime,this.currFacility);
+      examService.changeActsTimeTo(this.changeParamFor,this.tempTime,this.currFacility);
       this.timeChangeAct = false;
+      this.changeParamFor={};
     },
-    isActTimeChanging(act){
+    isActTimeChanging(act,idx){
       console.log('checking if the current act is changing its time by the user');
-      return examService.isActSameDateAndTime(act,this.changeTimeFor, this.acts);
-    }
+      if(this.changeParamFor.index === idx) return examService.isActSameDateAndTime(act,this.changeParamFor, this.acts, idx);
+      else return false;
+    },
+    editModeVal(act){
+      console.log('turning on edit mode', act);
+      // this.changeExamFor = act;
+      this.changeParamFor = {act:act};
+      // this.tempExamVal = act.val;
+    },
+
   },
    created () {
     this.currFacility = this.tempFacilities[0];

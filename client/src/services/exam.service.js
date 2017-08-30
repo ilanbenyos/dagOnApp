@@ -17,11 +17,14 @@ function isActSameDateAndTime(act,dateTime){
   else
     return false;
 }
+const isEmptyObject = function(obj){
+ return Object.keys(obj).length === 0 && obj.constructor === Object;
+};
 function changeActsTimeTo(dateTime, newTime, facility){
   console.log("facilityi.ponds",facility)
   facility.ponds.forEach( pond =>{
-    pond.acts.forEach( act =>{
-      if(isActSameDateAndTime(act,dateTime)) act.time = newTime
+    pond.acts.forEach( (act,idx) =>{
+      if(isActSameDateAndTime(act,dateTime) && idx === dateTime.index) act.time = newTime
     })
   });
 }
@@ -31,5 +34,6 @@ const generateId = function () {
 export default {
     createActObj,
     isActSameDateAndTime,
-    changeActsTimeTo
+    changeActsTimeTo,
+    isEmptyObject
   }
