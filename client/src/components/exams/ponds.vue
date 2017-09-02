@@ -81,7 +81,7 @@
                         </b-button>
                         
                         <b-button variant='danger'  
-                                    @click.stop="deleteFromList(listName,item._id,$event,idx)">
+                                    @click.stop="deleteFromList(listName,item._id,$event)">
                                 <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="delete">
                                     <i class="material-icons">delete_forever</i>
                                 </b-tooltip>
@@ -132,13 +132,14 @@
 </template>
 <script>
 import { SENDMSG } from '../../store/store'
+import Helpers from '../../services/helpers.service.js';
 import { sortlistBy2Keys, cloneDeep,getObjById} from '../../helpers/functions'
 import moment from 'moment'
 export default {
   name: 'Ponds',
   data() {
     return {
-    //   mixins: [mixins],
+      Helpers:Helpers,
       componentName:'Ponds list',
       state:this.$store.getters.fetchGetState,
       ponds:this.$store.getters.fetchGetPonds,
@@ -159,20 +160,20 @@ export default {
   mounted () {
         this.getList(this.listName,{});
         var list = this.$store.getters.fetchGetPonds;
-            list = sortlistBy2Keys(list,'fac','idx');
+            list = Helpers.sortlistBy2Keys(list,'fac','idx');
             this.list = list  
         },
     watch:{
       list1: function(newList){
             var list = this.$store.getters.fetchGetPonds;
-            list = sortlistBy2Keys(list,'fac','idx');
+            list = Helpers.sortlistBy2Keys(list,'fac','idx');
             this.list = list
       },
     },
     computed: {
         list1() {
             var list = this.$store.getters.fetchGetPonds;
-            list = sortlistBy2Keys(list,'fac','idx');
+            list = Helpers.sortlistBy2Keys(list,'fac','idx');
             return list;
         },
     },
@@ -194,7 +195,7 @@ export default {
   },
       editRecord(item){
             this.pageEdit =!this.pageEdit;
-            this.item = cloneDeep(item);
+            this.item = Helpers.cloneDeep(item);
       },
         toggleField(e,bul){
             var parent = e.path[5];
@@ -220,7 +221,7 @@ export default {
             }
                 acts.push({ actType: 'getList', list, criteria:{},askFrom:'server' })
                 this.sendMsg( {acts});
-                this. closeModal()
+                this.closeModal()
       },
       addNewLocalRecord(arr){
         this.item = {mode :'edit'};

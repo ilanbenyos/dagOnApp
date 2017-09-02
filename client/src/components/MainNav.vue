@@ -8,6 +8,8 @@
     <router-link to="/Fishes"><button>fishes</button></router-link>
     <router-link to="/Facilities"><button>Facilities</button></router-link>
     <router-link to="/Ponds"><button>ponds</button></router-link>
+    <router-link to="/Gmap"><button>gmap</button></router-link>
+    <router-link to="/Ex"><button>ex</button></router-link>
   </div>
 </template>
 

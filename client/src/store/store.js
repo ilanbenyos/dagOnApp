@@ -20,12 +20,17 @@ const state = {
   fishes:[],
   batches:[],
   graders:[],
-  fish:''
+  fish:'',
+  markers:[],
+
 };
 
 const getters = {
   fetchGetMsg(state) {
     return state.storeMsg;
+  },
+  fetchGetMarkers(state) {
+    return state.stores;
   },
   fetchGetUser(state) {
     return state.user;
@@ -93,7 +98,6 @@ const mutations = {
           state[list] = act.res;
         break;
         case 'updateInList':// 
-          //  var idx= getIdxById(act.id,act.list);
           var list = act.list
           var idx = state[list].findIndex(item => item._id==act.id);
           state[list][idx] = act.res;

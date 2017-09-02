@@ -7,14 +7,18 @@
   </div>
 </template>
 <script>
+
+
+
 import MainNav from '@/components/MainNav';
 import { SENDMSG } from './store/store';
+
 export default {
   name: 'app',
   data() {
     return {
       msg:'App.vue',
-      listsToUpload:['graders','fishes','facilities','pnds']
+      listsToInit:['graders','fishes','facilities','ponds']
     }
   },
     created() {
@@ -25,7 +29,7 @@ export default {
           this.$store.dispatch({ type: SENDMSG, msg })
       },
       getLists(){
-        const acts = this.listsToUpload.map(function (listName) {
+        const acts = this.listsToInit.map(function (listName) {
            return { actType: 'getList', list:listName, criteria:{} } 
           });
           this.sendMsg({acts});

@@ -4,18 +4,20 @@
       
       <div class="field flex row">
           <div class="field">{{currNum2}}</div>
-          <div class="field">-</div>
+          <div class="field">+</div>
           <div class="field">{{currNum1}}</div>
           <div class="field">=</div>
-          <input class="input" v-model="res"></input>
+          <input  @keyup.enter="resExam" class="input" v-model="res"></input>
           <button @click="resExam">פתור!!</button>
       </div>
-        <div  class= "field flex row " v-for="(exam,idx) in exams">
-          <div class="field">{{idx+1}}: {{exam.num2}}-{{exam.num1}} = {{exam.num2-exam.num1}}</div>
-          <div v-if="((exam.num2-exam.num1) === exam.enterdrRes)" class="field">נכון</div> 
-          <div v-else class="field">לא נכון</div>
+           == {{answers.currects}}/{{answers.wrongs}}==
+
+        <div  :class="[ idx==0  ? 'lastExam': '', 'field flex row']" v-for="(exam,idx) in exams">
+          <div class="field" >{{idx+1}}: {{exam.num2}}+{{exam.num1}} = {{exam.num2+exam.num1}} </div>
+
+          <div v-if="((exam.num2+exam.num1) === exam.enterdrRes)" class="field">נכון</div> 
+          <div v-else class="field">{{exam.res}} :לא נכון, נחשון חשב</div>
       </div>
-     == {{answers.currects}}/{{answers.wrongs}}==
   </section>
 </template>
 <script>
@@ -32,7 +34,8 @@ export default {
       currNum2:0,
       res:null,
       exams:[],
-      answers:{currects:0, wrongs:0}
+      answers:{currects:0, wrongs:0},
+      operator:''
       
     }
   },
@@ -57,11 +60,11 @@ export default {
        resExam(){
          var num1=this.currNum1;
          var num2=this.currNum2;
-         var currectRes = num2 -num1;
+         var currectRes = num2 +num1;
          var enterdrRes = +this.res;
          (enterdrRes ==currectRes)?this.answers.currects++ : this.answers.wrongs++;
-          var obj = {num1,num2,enterdrRes}
-          this.exams.push(obj);
+          var obj = {num1,num2,enterdrRes,res:this.res}
+          this.exams.unshift(obj);
           this.res = null;
           this.creatExam();
     }
@@ -77,6 +80,9 @@ export default {
 }
 .col{
   flex-direction: column;
+}
+.lastExam{
+  background-color: lightblue;
 }
 .field{
     margin:.3em;

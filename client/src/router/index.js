@@ -11,11 +11,12 @@ import Facilities from '@/components/exams/Facilities'
 import Graders from '@/components/exams/Graders'
 import Fishes from '@/components/exams/Fishes'
 import Ponds from '@/components/exams/Ponds'
+import Gmap from '@/components/exams/Gmap'
+import Ex from '@/components/exams/Ex'
 // import Grading from '@/components/exams/Grading'
 // import Grading from '@/components/exams/Grading'
 // import Grading from '@/components/exams/Grading'
 
-import Browse from '@/pages/Browse'
 
 
 Vue.use(Router)
@@ -28,13 +29,17 @@ export default new Router({
       name: 'Splash',
       component: Splash
     },{
+      path: '/Ex',
+      name: 'Ex',
+      component: Ex
+    },{
+      path: '/gmap',
+      name: 'Gmap',
+      component: Gmap
+    },{
       path: '/login',
       name: 'Login',
       component: Login
-    },{
-      path: '/browse',
-      name: 'Browse',
-      component: Browse
     },{
       path: '/oxygen',
       name: 'Oxygen',

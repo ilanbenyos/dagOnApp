@@ -68,12 +68,14 @@ export default {
       tempFacilities:[ { id:1, name:'harta', 
         ponds:[ { id:1, vol:20, 
           acts:[{id:1, date:new Date(), pond:1, type:TYPE_OXYGEN, time:6, val:10},
-          {id:2, date:new Date(), pond:1, type:TYPE_OXYGEN, time:12, val:11}
+                {id:2, date:new Date(), pond:1, type:TYPE_OXYGEN, time:12, val:11}
           ] },
           { id:2, vol:20, 
           acts:[{id:2, date:new Date(), pond:1, type:TYPE_OXYGEN, time:6, val:10},
-          {id:2, date:new Date(), pond:1, type:TYPE_OXYGEN, time:12, val:11}
-        ] },
+                {id:2, date:new Date(), pond:1, type:TYPE_OXYGEN, time:12, val:11},
+          ] },
+          { id:3, vol:20,acts:[{id:58, date:new Date(), pond:3, type:TYPE_OXYGEN, time:14, val:12},
+          ] },
         ] 
       } ],
       currFacility:null,
