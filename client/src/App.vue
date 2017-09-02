@@ -18,7 +18,7 @@ export default {
   data() {
     return {
       msg:'App.vue',
-      listsToInit:['graders','fishes','facilities','ponds']
+      listsToInit:['graders','fishes','facilities','ponds','branches']
     }
   },
     created() {

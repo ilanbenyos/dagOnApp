@@ -3,13 +3,14 @@
     <input id="autocomplete" 
           placeholder="Enter your address" type="text">
     </input>
-      <b-button variant='warning' @click.stop="send">
+      <b-button variant='warning' @click.stop="sendAutocomplete">
           <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="send">
             send
-              <!--<i class="material-icons">undo</i>-->
+              <!--<i class="material-icons">undo       </i>-->
           </b-tooltip>
       </b-button>
     <!--<button  @click="send">Send</button>-->
+    <button  @click="getApiDist">getApiDist</button>
     <button  @click="delMarker">delete marker</button>
     <button  @click="myGeolocation">myGeolocation</button>
     <button  @click="get2PointsDistance">get2PointsDistance</button>
@@ -46,6 +47,7 @@
 <script>
 import { SENDMSG } from '../../store/store'
 import Helpers from '../../services/helpers.service.js';
+import MapService from '../../services/places.service.js';
 import Vue from 'vue'
 const VueGoogleMaps = require('vue2-google-maps');
 
@@ -53,7 +55,7 @@ Vue.use(VueGoogleMaps, {
   load: {
     key: 'AIzaSyAIaE1djVXVF6V-ab6FjW-RQ48Q5ErH71Q',
     v: '3',
-    libraries: 'places'
+    libraries: 'geometry,places'
   }
 })
 export default {
@@ -66,23 +68,28 @@ export default {
       msg:'init',
       tooltipDelay:700,
       mapName: this.name + "-map",
-      center:{lat:32.38, lng:34.8},
-      markers: [{_id:1,position:{lat:32.38, lng:34.8}, name:"mark1",icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|773144"},
-                  {_id:2,position:{lat:32.39, lng:34.9}, name:"mark2",icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|123144"},
-                  {_id:3,position:{lat:32.37, lng:34.7}, name:"mark3",icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|990055"}],
+      center:{lat:32.42, lng:34.93},
+      markers: [{_id:1,position:{lat:32.42, lng:34.93}, name:"mark1",icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|773144"},
+                  {_id:2,position:{lat:32.425, lng:34.94}, name:"mark2",icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|123144"},
+                  {_id:3,position:{lat:32.423, lng:34.92}, name:"mark3",icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|990055"}],
       searchOver: false,
       list:[{_id:1,position:{lat:32.38, lng:34.8}},{_id:2,position:{lat:32.39, lng:34.9}}],
       listName:'stores',//need to be changed!!,
       isMap:true,
       selectedMarker:null,
+      searchMarker:null,
       isCreateMode:false,
     }
   },
   mounted () {
         this.getList(this.listName,{});
         var list = this.$store.getters.fetchGetPonds;
-            this.list = list  
-            this.initAutocomplete();
+          this.list = list  
+    var that = this;
+    setTimeout(function() {
+        // that.initMap();
+        that.initAutocomplete(that);
+    }, 1200);
   },
     watch:{
       list1: function(newList){
@@ -98,11 +105,20 @@ export default {
     },
 
   methods: {
+    getApiDist(){
+      
+      var item1 = this.markers[0];
+      var item2 = this.selectedMarker;
+      
+      var dist = MapService.getApiDist(item1,item2);
+        console.log('getApiDist:',dist)
+    },
     get2PointsDistance(){
       var latLngA = this.selectedMarker.position
       var latLngB = this.markers[0].position
-    
-      var dist = google.maps.geometry.spherical.computeDistanceBetween (latLngA, latLngB);
+      var dist = MapService.getDistance2Points(latLngA,latLngB);//
+        console.log('getdist1:',dist)
+      // var dist = google.maps.geometry.spherical.computeDistanceBetween (latLngA, latLngB);
 
     },
     mapClick(e){
@@ -114,12 +130,14 @@ export default {
       item.position.lat = e.latLng.lat();
       item.position.lng = e.latLng.lng();
         this.markers.splice(0,0,item);
+        this.saveRecord(this.listName,item,e)
     },
     dragEnd(marker,e,idx){
         console.log('marker.getposition1:',marker.position.lat, marker.position.lng)
         marker.position.lat = e.latLng.lat()
         marker.position.lng = e.latLng.lng()
         console.log('marker.getposition2:',marker.position.lat, marker.position.lng)
+
     },
     markerClick(item, idx ,e){
       this.selectedMarker=item;
@@ -143,16 +161,19 @@ export default {
         this.markers.splice(0,1);
       console.log('delMarker.this.markers.length:',this.markers.length);
     },
-        send() {
+      sendAutocomplete() {
       
+      if(!this.autocomplete) return
       let place = this.autocomplete.getPlace();
       if(!place) return;
       let lng = place.geometry.location.lng();
       let lat = place.geometry.location.lat();
-      var obj={ _id:this.markers.length+1, branch:1,position:{lng,lat},place}
-      console.log('=============obj:',obj);
-      // console.log('this.markers.length:',this.markers.length);
-      this.markers.splice(0, 0, obj)
+      var address = place.geometry.formatted_address;
+      // var obj={ _id:this.markers.length+1, branch:1,position:{lng,lat},place}
+      debugger
+             var obj =      {_id:this.markers.length+1,position:{lng,lat},address, name:"search"+this.markers.length ,icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|787878"}
+      this.markers.splice(this.markers.length, 0, obj);
+      this.selectedMarker = obj
       console.log('send.this.markers.length:',this.markers.length);//
 
     },
@@ -171,7 +192,7 @@ export default {
 
     //==========================================
 
-    initAutocomplete() {
+    initAutocomplete(that) {
       this.autocomplete = new google.maps.places.Autocomplete(
             /** @type {!HTMLInputElement} */(document.querySelector('#autocomplete')),
         { types: ['geocode'] });
@@ -204,15 +225,6 @@ export default {
             var inputNodes = parent.getElementsByTagName('input');
             this.toggleDisable(inputNodes,bul)
         },
-      saveAll(list,listName){
-        for (var i = 0; i < list.length; i++) {
-            list[i].mode = 'saved';
-            const acts =[
-                    { actType: 'updateInList', newObj: list[i], list:listName,askFrom:'server' },
-                        ]
-            this.sendMsg( {acts});
-        }                   
-      },
       saveRecord(list,newObj,e){
             newObj.mode = 'saved';
             const acts =[]

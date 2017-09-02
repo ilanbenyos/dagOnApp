@@ -10,6 +10,7 @@
     <router-link to="/Ponds"><button>ponds</button></router-link>
     <router-link to="/Gmap"><button>gmap</button></router-link>
     <router-link to="/Ex"><button>ex</button></router-link>
+    <router-link to="/Branches"><button>branches</button></router-link>
   </div>
 </template>
 
