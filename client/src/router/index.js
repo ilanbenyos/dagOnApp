@@ -15,6 +15,7 @@ import Gmap from '@/components/exams/Gmap'
 import Ex from '@/components/exams/Ex'
 import Branches from '@/components/exams/Branches'
 import Shops from '@/components/exams/Shops'
+import User from '@/components/exams/user'
 // import Grading from '@/components/exams/Grading'
 // import Grading from '@/components/exams/Grading'
 // import Grading from '@/components/exams/Grading'
@@ -34,6 +35,10 @@ export default new Router({
       path: '/Ex',
       name: 'Ex',
       component: Ex
+    },{
+      path: '/user',
+      name: 'User',
+      component: User
     },{
       path: '/gmap',
       name: 'Gmap',

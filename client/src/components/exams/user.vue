@@ -1,5 +1,6 @@
 <template>
   <div class="main">
+    <div class="flex row width90 auto-com">
         <input id="autocomplete" 
             placeholder="Enter your address" type="text">
         </input>
@@ -8,80 +9,31 @@
                 send
             </b-tooltip>
         </b-button>
-    <div class="flex row col1">
-        <div  v-if="isMap" class="map-container">
-        <gmap-map
-            id= 'map1' :center="center" :zoom="12" style="width: 600px; height: 700px" ref="map" 
-                @dbclick="mapDbClick.native.prevent($event)"    @click="mapClick($event)"
-            >
-            <gmap-marker
-                v-for="(item, idx) in list"
-                ref="list"
-                :icon="item.icon"
-                :label="item.name"
-                :position="item.position"
-                :clickable="true"
-                :draggable="true"
-                @click="markerClick(item, idx ,$event)"
-                @dragend="dragEnd(item,$event,idx)"
-                
-            >
-            </gmap-marker  >
-            </gmap-map> 
-            <b-button variant='primary' @click="pan">
-            </b-button>
-        </div>
-        <div class="flex col">
-            <div class="field  col ">
-                    <div class="field header">id:</div>
-                    <b-form-input disabled size="lg" @keydown.native="modalIsDirty" class="input" v-model="item._id"></b-form-input>
+    </div>                                
+    <!--===========RESULTS TABLE========-->
+            
+            <div v-if="isSearched" class= "list-container outline1" >
+                    <!--===========BRANCH RES========-->
+              <div class="flex row space-around margin-top-sm bg1">
+                  <div class="item width10 " > your best branch: </div>
+                  <div class="item width5 " > {{sortBranches[0].name}} </div>
+                  <div class="item width10 " >  average dist:  </div>
+                  <div class="item width5 " > {{sortBranches[0].dist}} </div>
+              </div>
+                    <!--===========STORES RES========-->
+              <div  class= "list-item outline1 flex col" v-for="(item,idx) in sortedList">
+                      <div class="flex row space-around margin-top-sm">
+                          <div class="item width5 " > {{idx+1}} </div>
+                          <div class="item width5 " > {{item.name}} </div>
+                          <div class="item width10 " > {{item.address}} </div>
+                          <div  class="item width5">{{item.dist}}
+                          </div>
+                      </div>
+              </div>
             </div>
-            <div class="field col ">
-                    <div class="field header">address:</div>
-                    <b-form-input size="lg" @keydown.native="modalIsDirty" class="input" v-model="item.address"></b-form-input>
-            </div>
-            <div class="field col ">
-                    <div class="field header ">branch:</div>
-                    {{item.branch}}
-                    <select v-model="item.branch" :options="branches" 
-                        @change="branchChanged(item)" >
-                        <option v-for="opt in branches" :value="opt._id">{{opt.name}} </option>
-                    </select>
-            </div>
-            <div v-if="item.position" class="field  col ">
-                    <div class="field header">position:</div>
-                    <b-form-input size="lg" @keydown.native="modalIsDirty" class="input" v-model="item.position.lat"></b-form-input>
-                    <b-form-input size="lg" @keydown.native="modalIsDirty" class="input" v-model="item.position.lng"></b-form-input>
-            </div>
-            <div v-if="item.name" class="field  col ">
-                    <div class="field header">store name:</div>
-                    <b-form-input size="lg" @keydown.native="modalIsDirty" class="input" v-model="item.name"></b-form-input>
-            </div>
-                                <!--===========BUTTONS PANNEL========-->
-                    <div  class="buttons-pnl">
-                        <b-button :class="{ btnDisabled: !modalDirty }" :disabled= "!modalDirty" variant='primary'  
-                            @click.stop="saveRecord(listName,item,$event)">
-                            <b-tooltip  class="margin-sides1" :delay="tooltipDelay" content="backup">
-                                    <i  class="material-icons">backup</i>
-                            </b-tooltip>
-                        </b-button>
-                        
-                        <b-button variant='danger'  
-                                    @click.stop="deleteFromList2(listName,item,$event)">
-                                <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="delete">
-                                    <i class="material-icons">delete_forever</i>
-                                </b-tooltip>
-                        </b-button>
-                        
-                        <b-button variant='warning' @click.stop="initItem">
-                            <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="undo">
-                                <i class="material-icons">undo</i>
-                            </b-tooltip>
-                        </b-button>
-                </div>
+                                <!--=========== END OF RESULTS TABLE========-->
 
-        </div>
-        </div>
+
     </div>
 </template>
 <script>
@@ -120,6 +72,9 @@ export default {
       branches: this.$store.getters.fetchGetBranches,
       modalDirty:false,
       isClientSearch:false,
+      sortedList:[],
+      sortBranches:[],
+      isSearched:false,
     }
   },
   mounted () {
@@ -221,21 +176,20 @@ export default {
         
       var obj = {position:{lng,lat},address, name:"search"+this.list.length ,icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|787878"}
       this.item = obj;
-        if(this.isClientSearch){
-            this.clientSearch()
-        }else{
-            this.list.splice(this.list.length, 0, obj);
-        }
+      this.clientSearch()
       console.log('send.this.list.length:',this.list.length);//
     },
     //=====================CLIENT SEARCH=====================
 addDists(list,item){
     var newList = list.map(store=>{
-        store.dist = MapService.getDistance2objs(store,item);
+        store.dist = + MapService.getDistance2objs(store,item);
         var branch = Helpers.getObjById(store.branch,this.branches);
-        if(store.dist<50*1000){
+        if(store.dist<50){
             branch.count++;
             branch.dist +=store.dist;
+            // branch.dist = (branch.dist).toFixed(1);
+            branch.dist = parseInt(branch.dist).toFixed(1);
+            
         }
         return store
     })
@@ -258,6 +212,9 @@ clientSearch(){
         var newList = this.addDists(this.list,this.item);
         var sortedStores = this.sortListByDist(newList);
         var sortBranches= this.sortListByDist(this.branches);
+        this.sortedList = sortedStores;
+        this.sortBranches =sortBranches.reverse();
+        this.isSearched = true;
         console.log('closest store:',sortedStores[0].name )
         console.log('best branch:',sortBranches[0].name )
 },
@@ -362,76 +319,35 @@ clientSearch(){
   },
   }
 </script>
-<style>
-  .map-container {
-    width: 600px;
-    height: 300px;
-    border:1px solid red;
+<style scoped>
+  .main{
+    overflow:initial;
   }
-        #map {
-        height: 100%;
+      .list-item{
+        width:98%;
+        padding:0.7em;
+        margin:0;
       }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
+      .width90{
+        width:90%;
+        margin:auto;
       }
-      #description {
-        font-family: Roboto;
-        font-size: 15px;
-        font-weight: 300;
+      .list-item:hover{
+        background-color: lightgreen;
       }
-      #infowindow-content .title {
-        font-weight: bold;
+      .list-container:nth-child(4) {
+          background-color: red;
       }
-      #infowindow-content {
-        display: none;
+      .list-container {
+          overflow-y:scroll;
+          overflow-x:none;
+          width:90%;
+          margin: auto;
+          height:75vh;
+          height:calc( 100vh - 200px)
       }
-      #map #infowindow-content {
-        display: inline;
-      }
-      .pac-card {
-        margin: 10px 10px 0 0;
-        border-radius: 2px 0 0 2px;
-        box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        outline: none;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        background-color: #fff;
-        font-family: Roboto;
-      }
-      #pac-container {
-        padding-bottom: 12px;
-        margin-right: 12px;
-      }
-      .pac-controls {
-        display: inline-block;
-        padding: 5px 11px;
-      }
-      .pac-controls label {
-        font-family: Roboto;
-        font-size: 13px;
-        font-weight: 300;
-      }
-      #pac-input {
-        background-color: #fff;
-        font-family: Roboto;
-        font-size: 15px;
-        font-weight: 300;
-        margin-left: 12px;
-        padding: 0 11px 0 13px;
-        text-overflow: ellipsis;
-        width: 400px;
-      }
-      #pac-input:focus {
-        border-color: #4d90fe;
-      }
-      #title {
-        color: #fff;
-        background-color: #4d90fe;
-        font-size: 25px;
-        font-weight: 500;
-        padding: 6px 12px;
-      }
+.bg1{
+    background-color: lightcyan
+  }
+
 </style>

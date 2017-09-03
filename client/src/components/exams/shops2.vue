@@ -8,6 +8,17 @@
                 send
             </b-tooltip>
         </b-button>
+        <!--<button  @click="send">Send</button>-->
+        <button  @click="getApiDist">getApiDist</button>
+        <button  @click="delMarker">delete marker</button>
+        <button  @click="myGeolocation">myGeolocation</button>
+        <button  @click="get2PointsDistance">get2PointsDistance</button>
+        <button  @click="isMap=!isMap">toggleIsMap</button>
+        <button  @click="isCreateMode=!isCreateMode">createNew</button>
+        ={{isCreateMode}}=
+        selectedMarker:{{list.length}}
+        {{selectedMarker}}
+        msg:{{msg}}
     <div class="flex row col1">
         <div  v-if="isMap" class="map-container">
         <gmap-map
@@ -78,6 +89,12 @@
                                 <i class="material-icons">undo</i>
                             </b-tooltip>
                         </b-button>
+                        <b-button variant='warning' @click.stop="isClientSearch=!isClientSearch">
+                            {{isClientSearch}}
+                            <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="undo">
+                                client search
+                            </b-tooltip>
+                        </b-button>
                 </div>
 
         </div>
@@ -90,6 +107,7 @@ import Helpers from '../../services/helpers.service.js';
 import MapService from '../../services/places.service.js';
 import Vue from 'vue'
 const VueGoogleMaps = require('vue2-google-maps');
+
 Vue.use(VueGoogleMaps, {
   load: {
     key: 'AIzaSyAIaE1djVXVF6V-ab6FjW-RQ48Q5ErH71Q',
@@ -120,6 +138,7 @@ export default {
       branches: this.$store.getters.fetchGetBranches,
       modalDirty:false,
       isClientSearch:false,
+
     }
   },
   mounted () {
@@ -152,6 +171,7 @@ export default {
             return list;
         },
     },
+
   methods: {
       
       createEmptyItem(){
@@ -171,6 +191,7 @@ export default {
       var dist = MapService.getDistance2Points(latLngA,latLngB);//
         console.log('getdist1:',dist)
       // var dist = google.maps.geometry.spherical.computeDistanceBetween (latLngA, latLngB);
+
     },
     mapClick(e){
       if(!this.isCreateMode){
@@ -188,6 +209,7 @@ export default {
         marker.position.lat = e.latLng.lat()
         marker.position.lng = e.latLng.lng()
         console.log('marker.getposition2:',marker.position.lat, marker.position.lng)
+
     },
     markerClick(item, idx ,e){
       this.item=item;
@@ -203,9 +225,11 @@ export default {
           lng: position.coords.longitude
         };
         console.log(' navigator.geolocation:',this.vue);
+
       });
     },
     delMarker(){
+
         var idx =Helpers.getIdxById(this.selectedMarker._id,this.list)
         this.list.splice(0,1);
       console.log('delMarker.this.list.length:',this.list.length);
@@ -264,13 +288,16 @@ clientSearch(){
     newMarker(location,map){
       var map = new google.maps.Map(document.getElementById('map'), {
         });
+
         var marker = new google.maps.Marker({
           position: myLatlng,
           map: map,
           title: 'Click to zoom'
         });
     },
+
     //==========================================
+
     initAutocomplete() {
       this.autocomplete = new google.maps.places.Autocomplete(
             /** @type {!HTMLInputElement} */(document.querySelector('#autocomplete')),
@@ -298,6 +325,8 @@ clientSearch(){
         var color = branchObj.color.substring(1);
         item.icon = "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|"+ color;
         item.name = branchObj.name;
+
+
     },
   closeModal(){
             this.pageEdit =false;
@@ -324,6 +353,7 @@ clientSearch(){
                 acts.push({ actType: 'getList', list, criteria:{},askFrom:'server' })
                 this.sendMsg( {acts});
                 this.item = this.createEmptyItem();
+
       },
       addNewLocalRecord(arr){
         this.item = {mode :'edit'};
@@ -382,15 +412,19 @@ clientSearch(){
         font-size: 15px;
         font-weight: 300;
       }
+
       #infowindow-content .title {
         font-weight: bold;
       }
+
       #infowindow-content {
         display: none;
       }
+
       #map #infowindow-content {
         display: inline;
       }
+
       .pac-card {
         margin: 10px 10px 0 0;
         border-radius: 2px 0 0 2px;
@@ -401,19 +435,23 @@ clientSearch(){
         background-color: #fff;
         font-family: Roboto;
       }
+
       #pac-container {
         padding-bottom: 12px;
         margin-right: 12px;
       }
+
       .pac-controls {
         display: inline-block;
         padding: 5px 11px;
       }
+
       .pac-controls label {
         font-family: Roboto;
         font-size: 13px;
         font-weight: 300;
       }
+
       #pac-input {
         background-color: #fff;
         font-family: Roboto;
@@ -424,9 +462,11 @@ clientSearch(){
         text-overflow: ellipsis;
         width: 400px;
       }
+
       #pac-input:focus {
         border-color: #4d90fe;
       }
+
       #title {
         color: #fff;
         background-color: #4d90fe;

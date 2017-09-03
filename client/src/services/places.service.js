@@ -32,11 +32,15 @@ var rad = function(x) {
 var getDistance2objs = function(obj1, obj2) {
     var p1 = obj1.position
     var p2 = obj2.position
-    var dist = getDistance2Points(p1, p2);
+    var ttt= 54;
+    var ttt= 54;
+    // var dist = getDistance2Points((p1, p2)/1000).toFixed(2);
+    var dist = (getDistance2Points(p1,p2)/1000).toFixed(2);
+;
     return dist;
 }
 //============================================
-var getDistance2Points = function(p1, p2) {
+var getDistance2Points = function(p1,p2) {
   var R = 6378137; // Earth’s mean radius in meter
   var dLat = rad(p2.lat - p1.lat);
   var dLong = rad(p2.lng - p1.lng);
