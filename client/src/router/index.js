@@ -14,6 +14,7 @@ import Ponds from '@/components/exams/Ponds'
 import Gmap from '@/components/exams/Gmap'
 import Ex from '@/components/exams/Ex'
 import Branches from '@/components/exams/Branches'
+import Shops from '@/components/exams/Shops'
 // import Grading from '@/components/exams/Grading'
 // import Grading from '@/components/exams/Grading'
 // import Grading from '@/components/exams/Grading'
@@ -65,6 +66,10 @@ export default new Router({
       path: '/branches',//
       name: 'Branches',
       component: Branches
+    },{
+      path: '/shops',//
+      name: 'Shops',
+      component: Shops
     },{
       path: '/ponds',//
       name: 'Ponds',

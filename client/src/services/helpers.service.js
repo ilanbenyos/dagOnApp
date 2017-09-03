@@ -39,6 +39,12 @@ const generateId = function () {
         })
         return idx
     }
+const sortList= function(list){
+    var newList = list.sort((a, b) =>{
+     return a.dist-b.dist
+    });
+    return newList;
+}
 
   //==============================================
 export default {

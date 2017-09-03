@@ -23,12 +23,16 @@ const state = {
   fish:'',
   markers:[],
   branches:[],
+  shops:[],
 
 };
 
 const getters = {
-  fetchGetMsg(state) {
+  fetchGetMsg(state) {//
     return state.storeMsg;
+  },
+  fetchGetShops(state) {//
+    return state.shops;
   },
   fetchGetBranches(state) {
     return state.branches;
