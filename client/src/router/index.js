@@ -16,9 +16,6 @@ import Ex from '@/components/exams/Ex'
 import Branches from '@/components/exams/Branches'
 import Shops from '@/components/exams/Shops'
 import User from '@/components/exams/user'
-// import Grading from '@/components/exams/Grading'
-// import Grading from '@/components/exams/Grading'
-// import Grading from '@/components/exams/Grading'
 
 
 

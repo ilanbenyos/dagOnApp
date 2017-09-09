@@ -36,6 +36,9 @@
             <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="save all">
                 <b-button  size="lg" variant='primary' @click="saveAll(list,listName)">save all</b-button>
             </b-tooltip>
+            <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="save all">
+                <b-button  size="lg" variant='primary' @click="openSwal">openSwal</b-button>
+            </b-tooltip>
             
             <b-button variant='primary'  @click="getList(listName,{},$event)">
                 <b-tooltip :delay="tooltipDelay" content="refresh list">
@@ -69,7 +72,7 @@
                         </b-button>
                         
                         <b-button variant='danger'  
-                                    @click.stop="deleteFromList(listName,item._id,$event)">
+                                    @click.stop="deleteFromList(listName,item,$event)">
                                 <b-tooltip class="margin-sides1" :delay="tooltipDelay" content="delete">
                                     <i class="material-icons">delete_forever</i>
                                 </b-tooltip>
@@ -122,7 +125,11 @@
 import { SENDMSG } from '../../store/store'
 import Helpers from '../../services/helpers.service.js';
 import { sortlistBy2Keys, cloneDeep,getObjById} from '../../helpers/functions'
-import moment from 'moment'
+import Vue from 'vue'
+import VueSweetAlert from 'vue-sweetalert'
+ 
+Vue.use(VueSweetAlert)
+
 export default {
   name: 'Branches',
   data() {
@@ -165,13 +172,38 @@ export default {
         },
     },
   methods: {//
+    deleteFromList(list,item,e){
+        var res = this.confirmDelete(list,item,e)
+        // this.modal2 =true;
+        console.log('deleteFromList.res:',res)
+      },
+      openSwal(){},
+    confirmDelete(list,item,e){
+        var that = this;
+        var res = this.$swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+            }).then(function (ttt) {
+                    console.log('ttt:',ttt);
+                    that.deleteFromList2(list,item,e)
+            }, function (dismiss) {
+                resolve(dismiss)
+                // return res
+            })
+            console.log('res:',res)
+    },
+      //=============================================================
       isDeletedItem(item){
            if(item.mode=== 'deleted'){
                 return 'deleted-item'
            }else{
                 return '';
            }
-        //    return (item.mode=== 'deleted')? 'deleted-item': '';
       },
     modalIsDirty(){
         this.modalDirty = true;
@@ -232,9 +264,6 @@ export default {
       },
       closeModal2(){
         this.modal2 =false;
-      },
-      deleteFromList(list,id,e){
-        this.modal2 =true;
       },
       toggleDisable(inputNodes,bul){
             for (var i = 0; i < inputNodes.length; i++) {
